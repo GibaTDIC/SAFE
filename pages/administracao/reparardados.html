@@ -1,830 +1,144 @@
-// ======================================================
-// SAFE
-// Módulo: Reparo de Dados (escolaId órfão/errado em
-// registros de avaliação)
-//
-// Só pra super_admin — mexe em dados de qualquer escola.
-// ======================================================
+<div class="page">
 
-import { db } from "../core/firebase.js";
+    <div class="page-header">
 
-import { souSuperAdmin, mostrarToast } from "../core/utils.js";
+        <div>
 
-import{
-    collection,
-    getDocs,
-    doc,
-    updateDoc,
-    deleteDoc,
-    setDoc,
-    writeBatch,
-    query,
-    where
-}
-from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+            <div class="page-title">
+                Reparo de Dados
+            </div>
 
-const COLECOES_AVALIACAO = [
-    "avaliacoes_circunferenciacintura",
-    "avaliacoes_leger",
-    "avaliacoes_imc",
-    "avaliacoes_flexibilidade",
-    "avaliacoes_abdominal",
-    "avaliacoes_medicineball",
-    "avaliacoes_saltohorizontal",
-    "avaliacoes_agilidade",
-    "avaliacoes_corrida20m",
-    "avaliacoes_corrida6min",
-    "alunos"
-];
+            <div class="page-subtitle">
+                Encontra e corrige avaliações com escolaId errado ou vazio.
+            </div>
 
-let btnEscanear, btnCorrigir, resumoScan, textoResumoScan;
+        </div>
 
-let cardResultados, listaProblemas, loader, textoLoader;
+    </div>
 
-let btnVerificarDuplicados, areaDuplicados, textoResumoDuplicados, listaDuplicados;
+    <div class="card">
 
-let btnVerificarTurmas, areaTurmasDuplicadas, textoResumoTurmas, listaTurmasDuplicadas, btnCorrigirTurmas;
+        <p style="color:#64748b">
 
-let gruposTurmasDuplicadas = [];
+            Escaneia as 9 coleções de avaliação e compara o <code>escolaId</code> gravado
+            em cada registro com o <code>escolaId</code> real da turma daquele registro.
+            Nada é alterado até você clicar em "Corrigir".
 
-let problemasEncontrados = [];
+        </p>
 
-let mapaTurmas = {};
+        <div class="toolbar">
 
-function obterElementos(){
+            <div class="toolbar-left"></div>
 
-    btnEscanear = document.getElementById("btnEscanear");
-    btnCorrigir = document.getElementById("btnCorrigir");
-    resumoScan = document.getElementById("resumoScan");
-    textoResumoScan = document.getElementById("textoResumoScan");
-    cardResultados = document.getElementById("cardResultados");
-    listaProblemas = document.getElementById("listaProblemas");
-    loader = document.getElementById("loader");
-    textoLoader = document.getElementById("textoLoader");
-    btnVerificarDuplicados = document.getElementById("btnVerificarDuplicados");
-    areaDuplicados = document.getElementById("areaDuplicados");
-    textoResumoDuplicados = document.getElementById("textoResumoDuplicados");
-    listaDuplicados = document.getElementById("listaDuplicados");
-    btnVerificarTurmas = document.getElementById("btnVerificarTurmas");
-    areaTurmasDuplicadas = document.getElementById("areaTurmasDuplicadas");
-    textoResumoTurmas = document.getElementById("textoResumoTurmas");
-    listaTurmasDuplicadas = document.getElementById("listaTurmasDuplicadas");
-    btnCorrigirTurmas = document.getElementById("btnCorrigirTurmas");
+            <div class="toolbar-right">
 
-}
+                <button id="btnEscanear" class="btn btn-primary">
+                    Escanear
+                </button>
 
-export async function init(){
+                <button id="btnCorrigir" class="btn btn-success" style="display:none">
+                    Corrigir todos os encontrados
+                </button>
 
-    obterElementos();
+            </div>
 
-    if(!souSuperAdmin()){
+        </div>
 
-        document.getElementById("content").innerHTML =
-            "<div class='page'><h2>Você não tem permissão pra acessar essa tela.</h2></div>";
+        <div id="resumoScan" style="display:none; margin-top:15px;">
 
-        return;
+            <p id="textoResumoScan"></p>
 
-    }
+        </div>
 
-    btnEscanear.addEventListener("click", escanear);
+    </div>
 
-    btnCorrigir.addEventListener("click", corrigirTudo);
+    <div class="card" id="cardResultados" style="display:none">
 
-    btnVerificarDuplicados.addEventListener("click", verificarDuplicados);
+        <table class="table">
 
-    btnVerificarTurmas.addEventListener("click", verificarTurmasDuplicadas);
+            <thead>
 
-    btnCorrigirTurmas.addEventListener("click", corrigirTurmasDuplicadas);
+                <tr>
+                    <th>Coleção</th>
+                    <th>Aluno</th>
+                    <th>Turma</th>
+                    <th>escolaId atual</th>
+                    <th>escolaId correto</th>
+                </tr>
 
-}
+            </thead>
 
-// ======================================================
-// ESCANEAR
-// ======================================================
+            <tbody id="listaProblemas"></tbody>
 
-async function escanear(){
+        </table>
 
-    abrirLoader("Escaneando...");
+    </div>
 
-    problemasEncontrados = [];
+    <div class="card">
 
-    try{
+        <h3>Possíveis turmas duplicadas</h3>
 
-        // 1) Carrega todas as turmas (id -> escolaId/nome), pra comparar
-        const snapTurmas = await getDocs(collection(db,"turmas"));
+        <p style="color:#64748b">
 
-        mapaTurmas = {};
+            Acha turmas da mesma escola com nome igual (ex: duas "6º Ano G"
+            separadas). Move os alunos da turma com menos gente pra turma
+            com mais gente, e apaga a duplicata vazia — essa correção é
+            segura de fazer automaticamente.
 
-        snapTurmas.forEach(d=>{
+        </p>
 
-            mapaTurmas[d.id] = { escolaId: d.data().escolaId || "", nome: d.data().nome || "" };
+        <button id="btnVerificarTurmas" class="btn btn-primary">
+            Verificar Turmas Duplicadas
+        </button>
 
-        });
+        <div id="areaTurmasDuplicadas" style="margin-top:15px; display:none">
 
-        // 2) Varre cada coleção de avaliação
-        for(const nomeColecao of COLECOES_AVALIACAO){
+            <p id="textoResumoTurmas"></p>
 
-            const snapshot = await getDocs(collection(db, nomeColecao));
+            <div id="listaTurmasDuplicadas"></div>
 
-            snapshot.forEach(docSnap=>{
+            <button id="btnCorrigirTurmas" class="btn btn-success" style="display:none; margin-top:10px;">
+                Corrigir turmas duplicadas
+            </button>
 
-                const dados = docSnap.data();
+        </div>
 
-                const turma = mapaTurmas[dados.turmaId];
+    </div>
 
-                if(!turma){
+    <div class="card">
 
-                    // avaliação com turmaId que não existe mais — sinaliza,
-                    // mas não tem como corrigir automaticamente
-                    return;
+        <h3>Possíveis alunos duplicados</h3>
 
-                }
+        <p style="color:#64748b">
 
-                const escolaCorreta = turma.escolaId;
+            Agrupa alunos da mesma turma com nome parecido. <strong>Não corrige
+            nada sozinho</strong> — decidir qual registro manter (ou se são
+            mesmo pessoas diferentes) exige seu julgamento. Depois de decidir,
+            exclua o duplicado direto na tela de Alunos.
 
-                if(escolaCorreta && dados.escolaId !== escolaCorreta){
+        </p>
 
-                    problemasEncontrados.push({
+        <button id="btnVerificarDuplicados" class="btn btn-primary">
+            Verificar Duplicados
+        </button>
 
-                        colecao: nomeColecao,
-                        docId: docSnap.id,
-                        nomeAluno: dados.nome || "-",
-                        nomeTurma: turma.nome || "-",
-                        escolaAtual: dados.escolaId || "(vazio)",
-                        escolaCorreta,
-                        atualizacao: { escolaId: escolaCorreta }
+        <div id="areaDuplicados" style="margin-top:15px; display:none">
 
-                    });
+            <p id="textoResumoDuplicados"></p>
 
-                }
+            <div id="listaDuplicados"></div>
 
-            });
+        </div>
 
-        }
+    </div>
 
-        // 3) Verifica se algum USUÁRIO ainda está no formato antigo
-        // (só "escolaId", sem "escolaIds") — sem isso, as regras de
-        // segurança não conseguem saber a escola dele e tudo trava com
-        // "Missing or insufficient permissions" pra essa conta.
-        const snapUsuarios = await getDocs(collection(db,"usuarios"));
+    <div id="loader" class="loader">
 
-        snapUsuarios.forEach(docSnap=>{
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <p id="textoLoader">Escaneando...</p>
+        </div>
 
-            const dados = docSnap.data();
+    </div>
 
-            const temEscolaIdsValido = Array.isArray(dados.escolaIds);
-
-            if(temEscolaIdsValido){
-
-                return;
-
-            }
-
-            const escolaIdsCorrigido = dados.escolaId ? [dados.escolaId] : [];
-
-            problemasEncontrados.push({
-
-                colecao: "usuarios",
-                docId: docSnap.id,
-                nomeAluno: dados.nome || "-",
-                nomeTurma: `(papel: ${dados.papel || "-"})`,
-                escolaAtual: "(sem escolaIds)",
-                escolaCorreta: escolaIdsCorrigido.join(", ") || "(nenhuma)",
-                atualizacao: { escolaIds: escolaIdsCorrigido }
-
-            });
-
-        });
-
-        // 4) Confere se o contador do código SAFE está inicializado
-        // corretamente (maior ou igual ao maior código já emitido).
-        // Sem isso, o contador novo poderia começar do zero e gerar
-        // código repetido de aluno já existente.
-        const snapAlunosParaContador = await getDocs(collection(db,"alunos"));
-
-        let maiorCodigoExistente = 0;
-
-        snapAlunosParaContador.forEach(docSnap=>{
-
-            const codigo = docSnap.data().codigoSAFE || "";
-
-            const numero = parseInt(codigo.replace("SAFE",""));
-
-            if(!isNaN(numero) && numero > maiorCodigoExistente){
-
-                maiorCodigoExistente = numero;
-
-            }
-
-        });
-
-        const snapContador = await getDocs(collection(db,"contadores"));
-
-        let valorAtualContador = 0;
-
-        snapContador.forEach(docSnap=>{
-
-            if(docSnap.id === "alunos"){
-
-                valorAtualContador = docSnap.data().ultimoNumero || 0;
-
-            }
-
-        });
-
-        if(valorAtualContador < maiorCodigoExistente){
-
-            problemasEncontrados.push({
-
-                colecao: "contadores",
-                docId: "alunos",
-                nomeAluno: "-",
-                nomeTurma: "(contador global do código SAFE)",
-                escolaAtual: String(valorAtualContador),
-                escolaCorreta: String(maiorCodigoExistente),
-                atualizacao: { ultimoNumero: maiorCodigoExistente }
-
-            });
-
-        }
-
-        // 5) Confere se a contagem de alunos (quantidadeAlunos) de cada
-        // turma bate com o número real de alunos matriculados nela —
-        // pode ter ficado desatualizada por causa do mesmo bug de
-        // permissão que afetava essa contagem antes.
-        const snapTodasTurmas = await getDocs(collection(db,"turmas"));
-
-        const snapTodosAlunos = await getDocs(collection(db,"alunos"));
-
-        const contagemReal = {};
-
-        snapTodosAlunos.forEach(docSnap=>{
-
-            const turmaIdDoAluno = docSnap.data().turmaId;
-
-            if(turmaIdDoAluno){
-
-                contagemReal[turmaIdDoAluno] = (contagemReal[turmaIdDoAluno] || 0) + 1;
-
-            }
-
-        });
-
-        snapTodasTurmas.forEach(docSnap=>{
-
-            const dadosTurma = docSnap.data();
-
-            const quantidadeReal = contagemReal[docSnap.id] || 0;
-
-            const quantidadeSalva = dadosTurma.quantidadeAlunos || 0;
-
-            if(quantidadeReal !== quantidadeSalva){
-
-                problemasEncontrados.push({
-
-                    colecao: "turmas",
-                    docId: docSnap.id,
-                    nomeAluno: "-",
-                    nomeTurma: dadosTurma.nome || "-",
-                    escolaAtual: `${quantidadeSalva} aluno(s) salvo(s)`,
-                    escolaCorreta: `${quantidadeReal} aluno(s) real(is)`,
-                    atualizacao: { quantidadeAlunos: quantidadeReal }
-
-                });
-
-            }
-
-        });
-
-        // 6) Confere se existe codigoSAFE duplicado entre alunos — esse
-        // código precisa ser único pra sempre (é ele que carrega o
-        // histórico do aluno junto, mesmo que a matrícula mude).
-        const alunosPorCodigo = {};
-
-        snapAlunosParaContador.forEach(docSnap=>{
-
-            const dadosAluno = docSnap.data();
-
-            const codigo = dadosAluno.codigoSAFE;
-
-            if(!codigo){
-
-                return;
-
-            }
-
-            if(!alunosPorCodigo[codigo]){
-
-                alunosPorCodigo[codigo] = [];
-
-            }
-
-            alunosPorCodigo[codigo].push({
-
-                id: docSnap.id,
-                nome: dadosAluno.nome || "-",
-                criadoEm: dadosAluno.criadoEm ? dadosAluno.criadoEm.toMillis() : 0
-
-            });
-
-        });
-
-        // próximo número livre pra reatribuir, sempre acima do maior já usado
-        let proximoNumeroLivre = maiorCodigoExistente + 1;
-
-        Object.entries(alunosPorCodigo).forEach(([codigo, listaAlunos])=>{
-
-            if(listaAlunos.length <= 1){
-
-                return;
-
-            }
-
-            // o mais antigo (criado primeiro) mantém o código original —
-            // só os "duplicados" mais novos recebem um código novo
-            listaAlunos.sort((a,b) => a.criadoEm - b.criadoEm);
-
-            listaAlunos.slice(1).forEach(aluno=>{
-
-                const novoCodigo = "SAFE" + String(proximoNumeroLivre).padStart(6,"0");
-
-                proximoNumeroLivre++;
-
-                problemasEncontrados.push({
-
-                    colecao: "alunos",
-                    docId: aluno.id,
-                    nomeAluno: aluno.nome,
-                    nomeTurma: `(código SAFE duplicado: ${codigo})`,
-                    escolaAtual: codigo,
-                    escolaCorreta: novoCodigo,
-                    atualizacao: { codigoSAFE: novoCodigo }
-
-                });
-
-            });
-
-        });
-
-        renderizarResultados();
-
-    }catch(e){
-
-        console.error(e);
-
-        mostrarToast("Erro ao escanear.", "erro");
-
-    }finally{
-
-        fecharLoader();
-
-    }
-
-}
-
-function renderizarResultados(){
-
-    resumoScan.style.display = "block";
-
-    if(problemasEncontrados.length === 0){
-
-        textoResumoScan.textContent = "Nenhum problema encontrado — todos os registros e usuários estão com os dados certos.";
-
-        cardResultados.style.display = "none";
-
-        btnCorrigir.style.display = "none";
-
-        return;
-
-    }
-
-    textoResumoScan.textContent = `${problemasEncontrados.length} problema(s) encontrado(s) (escolaId incorreto em registros e/ou usuários sem escolaIds).`;
-
-    cardResultados.style.display = "block";
-
-    btnCorrigir.style.display = "inline-block";
-
-    listaProblemas.innerHTML = "";
-
-    problemasEncontrados.forEach(p=>{
-
-        listaProblemas.innerHTML += `
-
-            <tr>
-                <td>${p.colecao}</td>
-                <td>${p.nomeAluno}</td>
-                <td>${p.nomeTurma}</td>
-                <td>${p.escolaAtual}</td>
-                <td>${p.escolaCorreta}</td>
-            </tr>
-
-        `;
-
-    });
-
-}
-
-// ======================================================
-// CORRIGIR TUDO
-// (em lotes de até 500 — limite do writeBatch do Firestore)
-// ======================================================
-
-async function corrigirTudo(){
-
-    if(problemasEncontrados.length === 0){
-
-        return;
-
-    }
-
-    if(!confirm(`Corrigir ${problemasEncontrados.length} registro(s)? Essa ação não pode ser desfeita automaticamente.`)){
-
-        return;
-
-    }
-
-    abrirLoader("Corrigindo...");
-
-    btnCorrigir.disabled = true;
-
-    try{
-
-        const tamanhoLote = 450;
-
-        for(let i = 0; i < problemasEncontrados.length; i += tamanhoLote){
-
-            const lote = writeBatch(db);
-
-            const fatia = problemasEncontrados.slice(i, i + tamanhoLote);
-
-            fatia.forEach(p=>{
-
-                const refDoc = doc(db, p.colecao, p.docId);
-
-                lote.set(refDoc, p.atualizacao, { merge: true });
-
-            });
-
-            await lote.commit();
-
-        }
-
-        mostrarToast(`${problemasEncontrados.length} registro(s) corrigido(s) com sucesso!`);
-
-        problemasEncontrados = [];
-
-        renderizarResultados();
-
-    }catch(e){
-
-        console.error(e);
-
-        mostrarToast("Erro ao corrigir. Confira o console.", "erro");
-
-    }finally{
-
-        btnCorrigir.disabled = false;
-
-        fecharLoader();
-
-    }
-
-}
-
-// ======================================================
-// VERIFICAR POSSÍVEIS DUPLICADOS
-// Agrupa por turma + nome normalizado (sem acento, minúsculo,
-// sem espaço duplicado) — só lista, não corrige sozinho.
-// ======================================================
-
-function normalizarNomeParaComparacao(nome){
-
-    return (nome || "")
-        .toString()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/\s+/g, " ")
-        .trim();
-
-}
-
-async function verificarDuplicados(){
-
-    abrirLoader("Verificando duplicados...");
-
-    try{
-
-        const snapTurmas = await getDocs(collection(db,"turmas"));
-
-        const nomesTurmas = {};
-
-        snapTurmas.forEach(d => nomesTurmas[d.id] = d.data().nome || "-");
-
-        const snapAlunos = await getDocs(collection(db,"alunos"));
-
-        const grupos = {};
-
-        snapAlunos.forEach(docSnap=>{
-
-            const dados = docSnap.data();
-
-            const nomeNormalizado = normalizarNomeParaComparacao(dados.nome);
-
-            const chave = `${dados.turmaId || "sem-turma"}::${nomeNormalizado}`;
-
-            if(!grupos[chave]){
-
-                grupos[chave] = [];
-
-            }
-
-            grupos[chave].push({
-
-                id: docSnap.id,
-                nome: dados.nome || "-",
-                matricula: dados.matricula || "-",
-                codigoSAFE: dados.codigoSAFE || "-",
-                turmaId: dados.turmaId,
-                criadoEm: dados.criadoEm ? dados.criadoEm.toDate().toLocaleDateString("pt-BR") : "-"
-
-            });
-
-        });
-
-        const gruposComDuplicata = Object.values(grupos).filter(g => g.length > 1);
-
-        areaDuplicados.style.display = "block";
-
-        if(gruposComDuplicata.length === 0){
-
-            textoResumoDuplicados.textContent = "Nenhum possível duplicado encontrado.";
-
-            listaDuplicados.innerHTML = "";
-
-        }else{
-
-            textoResumoDuplicados.textContent = `${gruposComDuplicata.length} grupo(s) com possível duplicidade.`;
-
-            listaDuplicados.innerHTML = gruposComDuplicata.map(grupo=>{
-
-                const nomeTurma = nomesTurmas[grupo[0].turmaId] || "(sem turma)";
-
-                const linhas = grupo.map(a => `
-
-                    <tr>
-                        <td>${a.nome}</td>
-                        <td>${a.matricula}</td>
-                        <td>${a.codigoSAFE}</td>
-                        <td>${a.criadoEm}</td>
-                    </tr>
-
-                `).join("");
-
-                return `
-
-                    <div class="card" style="margin-top:12px; background:#FFFBEB;">
-                        <strong>Turma: ${nomeTurma}</strong>
-                        <table class="table" style="margin-top:8px;">
-                            <thead>
-                                <tr><th>Nome</th><th>Matrícula</th><th>Código SAFE</th><th>Criado em</th></tr>
-                            </thead>
-                            <tbody>${linhas}</tbody>
-                        </table>
-                    </div>
-
-                `;
-
-            }).join("");
-
-        }
-
-    }catch(e){
-
-        console.error(e);
-
-        mostrarToast("Erro ao verificar duplicados.", "erro");
-
-    }finally{
-
-        fecharLoader();
-
-    }
-
-}
-
-// ======================================================
-// VERIFICAR / CORRIGIR TURMAS DUPLICADAS
-// Agrupa por escola + nome normalizado. Se achar mais de
-// uma turma com o mesmo nome na mesma escola, a correção é
-// segura: move os alunos da(s) turma(s) com menos gente pra
-// turma com mais gente, e apaga as duplicatas esvaziadas.
-// ======================================================
-
-async function verificarTurmasDuplicadas(){
-
-    abrirLoader("Verificando turmas...");
-
-    try{
-
-        const snapTurmas = await getDocs(collection(db,"turmas"));
-
-        const snapAlunos = await getDocs(collection(db,"alunos"));
-
-        const contagemAlunos = {};
-
-        snapAlunos.forEach(docSnap=>{
-
-            const turmaId = docSnap.data().turmaId;
-
-            if(turmaId){
-
-                contagemAlunos[turmaId] = (contagemAlunos[turmaId] || 0) + 1;
-
-            }
-
-        });
-
-        const grupos = {};
-
-        snapTurmas.forEach(docSnap=>{
-
-            const dados = docSnap.data();
-
-            const chave = `${dados.escolaId || "sem-escola"}::${normalizarNomeParaComparacao(dados.nome)}`;
-
-            if(!grupos[chave]){
-
-                grupos[chave] = [];
-
-            }
-
-            grupos[chave].push({
-
-                id: docSnap.id,
-                nome: dados.nome || "-",
-                escolaId: dados.escolaId || "",
-                quantidadeAlunos: contagemAlunos[docSnap.id] || 0
-
-            });
-
-        });
-
-        gruposTurmasDuplicadas = Object.values(grupos).filter(g => g.length > 1);
-
-        areaTurmasDuplicadas.style.display = "block";
-
-        if(gruposTurmasDuplicadas.length === 0){
-
-            textoResumoTurmas.textContent = "Nenhuma turma duplicada encontrada.";
-
-            listaTurmasDuplicadas.innerHTML = "";
-
-            btnCorrigirTurmas.style.display = "none";
-
-        }else{
-
-            textoResumoTurmas.textContent = `${gruposTurmasDuplicadas.length} grupo(s) de turma duplicada encontrado(s).`;
-
-            listaTurmasDuplicadas.innerHTML = gruposTurmasDuplicadas.map(grupo=>{
-
-                // a que tem mais alunos vira a principal; o resto é apagado
-                const ordenado = [...grupo].sort((a,b) => b.quantidadeAlunos - a.quantidadeAlunos);
-
-                const principal = ordenado[0];
-
-                const duplicatas = ordenado.slice(1);
-
-                const linhasDuplicatas = duplicatas
-
-                    .map(d => `<li>${d.nome} — ${d.quantidadeAlunos} aluno(s), será apagada (alunos vão pra principal)</li>`)
-
-                    .join("");
-
-                return `
-
-                    <div class="card" style="margin-top:12px; background:#FFFBEB;">
-                        <strong>${principal.nome}</strong> — ficará como principal (${principal.quantidadeAlunos} aluno(s) hoje)
-                        <ul>${linhasDuplicatas}</ul>
-                    </div>
-
-                `;
-
-            }).join("");
-
-            btnCorrigirTurmas.style.display = "inline-block";
-
-        }
-
-    }catch(e){
-
-        console.error(e);
-
-        mostrarToast("Erro ao verificar turmas.", "erro");
-
-    }finally{
-
-        fecharLoader();
-
-    }
-
-}
-
-async function corrigirTurmasDuplicadas(){
-
-    if(gruposTurmasDuplicadas.length === 0){
-
-        return;
-
-    }
-
-    if(!confirm(`Corrigir ${gruposTurmasDuplicadas.length} grupo(s) de turma duplicada? Os alunos das turmas menores serão movidos pra turma principal, e as duplicatas vazias serão apagadas. Essa ação não pode ser desfeita automaticamente.`)){
-
-        return;
-
-    }
-
-    abrirLoader("Corrigindo turmas...");
-
-    btnCorrigirTurmas.disabled = true;
-
-    try{
-
-        for(const grupo of gruposTurmasDuplicadas){
-
-            const ordenado = [...grupo].sort((a,b) => b.quantidadeAlunos - a.quantidadeAlunos);
-
-            const principal = ordenado[0];
-
-            const duplicatas = ordenado.slice(1);
-
-            for(const duplicata of duplicatas){
-
-                // move os alunos dessa duplicata pra turma principal
-                const qAlunosDaDuplicata = query(collection(db,"alunos"), where("turmaId","==",duplicata.id));
-
-                const snapAlunosDuplicata = await getDocs(qAlunosDaDuplicata);
-
-                const lote = writeBatch(db);
-
-                snapAlunosDuplicata.forEach(docSnap=>{
-
-                    lote.update(doc(db,"alunos",docSnap.id), { turmaId: principal.id });
-
-                });
-
-                await lote.commit();
-
-                // apaga a turma duplicada (já esvaziada)
-                await deleteDoc(doc(db,"turmas",duplicata.id));
-
-            }
-
-            // recalcula a contagem certa da turma principal
-            const qAlunosPrincipal = query(collection(db,"alunos"), where("turmaId","==",principal.id));
-
-            const snapAlunosPrincipal = await getDocs(qAlunosPrincipal);
-
-            await setDoc(doc(db,"turmas",principal.id), { quantidadeAlunos: snapAlunosPrincipal.size }, { merge: true });
-
-        }
-
-        mostrarToast(`${gruposTurmasDuplicadas.length} grupo(s) de turma corrigido(s) com sucesso!`);
-
-        gruposTurmasDuplicadas = [];
-
-        areaTurmasDuplicadas.style.display = "none";
-
-    }catch(e){
-
-        console.error(e);
-
-        mostrarToast("Erro ao corrigir turmas. Confira o console.", "erro");
-
-    }finally{
-
-        btnCorrigirTurmas.disabled = false;
-
-        fecharLoader();
-
-    }
-
-}
-
-// ======================================================
-// LOADER
-// ======================================================
-
-function abrirLoader(texto){
-
-    textoLoader.textContent = texto;
-
-    loader.style.display = "flex";
-
-}
-
-function fecharLoader(){
-
-    loader.style.display = "none";
-
-}
+</div>

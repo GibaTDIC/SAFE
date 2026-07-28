@@ -1,6 +1,12 @@
 // ======================================================
 // SAFE
-// Módulo: Relatório de Estatísticas
+// Módulo: Relatório Científico (Módulo 2)
+//
+// Estatística descritiva de verdade, calculada em cima dos
+// dados reais do Firestore. NÃO inclui testes de hipótese
+// (ANOVA, qui-quadrado, regressão) nessa versão — isso
+// exigiria uma biblioteca estatística validada, que ainda
+// não foi integrada ao sistema.
 // ======================================================
 
 import { db } from "../core/firebase.js";
@@ -11,6 +17,8 @@ import {
     mostrarToast
 } from "../core/utils.js";
 
+import { calcularIdade } from "./leger.js";
+
 import{
     collection,
     getDocs,
@@ -20,52 +28,230 @@ import{
 from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 // ======================================================
-// CONFIGURAÇÃO DOS TESTES
-// categorias: ordem fixa de exibição (mesmo que não tenha
-// nenhum aluno numa categoria, ela aparece com 0%, pra
-// manter os gráficos comparáveis entre escolas/turmas).
+// VARIÁVEIS NUMÉRICAS ANALISADAS
+// Cada uma sabe de qual coleção e campo tirar o valor.
+// "idade" é calculada direto do cadastro do aluno, não vem
+// de avaliação nenhuma.
 // ======================================================
 
-const CATEGORIAS_SAUDE = ["Zona de risco à saúde","Zona saudável"];
+const VARIAVEIS_NUMERICAS = [
 
-const TESTES_CONFIG = [
-
-    { colecao:"avaliacoes_leger", titulo:"Léger", campo:"classificacao",
-      categorias:["Zona de risco à saúde","Precisa melhorar","Zona saudável"] },
-
-    { colecao:"avaliacoes_circunferenciacintura", titulo:"Perímetro da Cintura (RCE)", campo:"classificacaoSaude",
-      categorias:["Zona de risco à saúde","Zona saudável"] },
-
-    { colecao:"avaliacoes_imc", titulo:"IMC", campo:"classificacaoSaude",
-      categorias:["Zona de risco à saúde","Zona saudável"] },
-
-    { colecao:"avaliacoes_flexibilidade", titulo:"Flexibilidade", campo:"classificacaoDesempenho",
-      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"],
-      campoSaude:"classificacaoSaude", categoriasSaude:CATEGORIAS_SAUDE },
-
-    { colecao:"avaliacoes_abdominal", titulo:"Resistência Muscular Localizada", campo:"classificacaoDesempenho",
-      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"],
-      campoSaude:"classificacaoSaude", categoriasSaude:CATEGORIAS_SAUDE },
-
-    { colecao:"avaliacoes_medicineball", titulo:"Potência de Membros Superiores", campo:"classificacaoDesempenho",
-      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"],
-      campoSaude:"classificacaoSaude", categoriasSaude:CATEGORIAS_SAUDE },
-
-    { colecao:"avaliacoes_saltohorizontal", titulo:"Potência de Membros Inferiores", campo:"classificacaoDesempenho",
-      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"] },
-
-    { colecao:"avaliacoes_agilidade", titulo:"Agilidade", campo:"classificacaoDesempenho",
-      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"] },
-
-    { colecao:"avaliacoes_corrida20m", titulo:"Velocidade", campo:"classificacaoDesempenho",
-      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"],
-      campoSaude:"classificacaoSaude", categoriasSaude:CATEGORIAS_SAUDE },
-
-    { colecao:"avaliacoes_corrida6min", titulo:"Aptidão Cardiorrespiratória", campo:"classificacaoDesempenho",
-      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"],
-      campoSaude:"classificacaoSaude", categoriasSaude:CATEGORIAS_SAUDE }
+    { titulo:"Idade (anos)", origem:"aluno" },
+    { titulo:"Circunferência da Cintura (cm)", colecao:"avaliacoes_circunferenciacintura", campo:"cintura" },
+    { titulo:"Razão Cintura-Estatura (RCE)", colecao:"avaliacoes_circunferenciacintura", campo:"rce" },
+    { titulo:"Peso (kg)", colecao:"avaliacoes_imc", campo:"peso" },
+    { titulo:"Estatura (cm)", colecao:"avaliacoes_imc", campo:"estatura" },
+    { titulo:"IMC", colecao:"avaliacoes_imc", campo:"imc" },
+    { titulo:"Léger (VO₂máx)", colecao:"avaliacoes_leger", campo:"vo2max" },
+    { titulo:"Flexibilidade (cm)", colecao:"avaliacoes_flexibilidade", campo:"distanciaCm" },
+    { titulo:"Abdominal (repetições)", colecao:"avaliacoes_abdominal", campo:"repeticoes" },
+    { titulo:"Medicine Ball (cm)", colecao:"avaliacoes_medicineball", campo:"distanciaCm" },
+    { titulo:"Salto Horizontal (cm)", colecao:"avaliacoes_saltohorizontal", campo:"distanciaCm" },
+    { titulo:"Agilidade (s)", colecao:"avaliacoes_agilidade", campo:"tempoSegundos" },
+    { titulo:"Corrida 20m (s)", colecao:"avaliacoes_corrida20m", campo:"tempoSegundos" },
+    { titulo:"Corrida 6min (m)", colecao:"avaliacoes_corrida6min", campo:"distanciaM" }
 
 ];
+
+// Testes com classificação categórica (pra Tabela 3)
+const TESTES_CATEGORICOS = [
+
+    { titulo:"Perímetro da Cintura (RCE)", colecao:"avaliacoes_circunferenciacintura", campo:"classificacaoSaude",
+      categorias:["Zona de risco à saúde","Zona saudável"] },
+
+    { titulo:"Léger", colecao:"avaliacoes_leger", campo:"classificacao",
+      categorias:["Zona de risco à saúde","Precisa melhorar","Zona saudável"] },
+
+    { titulo:"IMC", colecao:"avaliacoes_imc", campo:"classificacaoSaude",
+      categorias:["Zona de risco à saúde","Zona saudável"] },
+
+    { titulo:"Flexibilidade", colecao:"avaliacoes_flexibilidade", campo:"classificacaoDesempenho",
+      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"] },
+
+    { titulo:"Resist. Muscular", colecao:"avaliacoes_abdominal", campo:"classificacaoDesempenho",
+      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"] },
+
+    { titulo:"Potência Superior", colecao:"avaliacoes_medicineball", campo:"classificacaoDesempenho",
+      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"] },
+
+    { titulo:"Potência Inferior", colecao:"avaliacoes_saltohorizontal", campo:"classificacaoDesempenho",
+      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"] },
+
+    { titulo:"Agilidade", colecao:"avaliacoes_agilidade", campo:"classificacaoDesempenho",
+      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"] },
+
+    { titulo:"Velocidade", colecao:"avaliacoes_corrida20m", campo:"classificacaoDesempenho",
+      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"] },
+
+    { titulo:"Apt. Cardiorresp.", colecao:"avaliacoes_corrida6min", campo:"classificacaoDesempenho",
+      categorias:["Fraco","Razoável","Bom","Muito Bom","Excelência"] }
+
+];
+
+// ======================================================
+// FUNÇÕES ESTATÍSTICAS
+// ======================================================
+
+function media(valores){
+
+    return valores.reduce((soma, v) => soma + v, 0) / valores.length;
+
+}
+
+function desvioPadrao(valores, m){
+
+    if(valores.length < 2){
+        return 0;
+    }
+
+    const somaQuadrados = valores.reduce((soma, v) => soma + Math.pow(v - m, 2), 0);
+
+    return Math.sqrt(somaQuadrados / (valores.length - 1));
+
+}
+
+function mediana(ordenado){
+
+    const meio = Math.floor(ordenado.length / 2);
+
+    return ordenado.length % 2 !== 0
+
+        ? ordenado[meio]
+
+        : (ordenado[meio - 1] + ordenado[meio]) / 2;
+
+}
+
+function moda(valores){
+
+    const contagem = new Map();
+
+    valores.forEach(v => contagem.set(v, (contagem.get(v) || 0) + 1));
+
+    let maiorContagem = 0;
+
+    contagem.forEach(c => { if(c > maiorContagem) maiorContagem = c; });
+
+    if(maiorContagem <= 1){
+
+        return "Amodal";
+
+    }
+
+    const modas = [];
+
+    contagem.forEach((c, v) => { if(c === maiorContagem) modas.push(v); });
+
+    return modas.sort((a,b)=>a-b).map(v => arredondar(v)).join(", ");
+
+}
+
+function percentil(ordenado, p){
+
+    const indice = (p / 100) * (ordenado.length - 1);
+
+    const baixo = Math.floor(indice);
+
+    const alto = Math.ceil(indice);
+
+    if(baixo === alto){
+
+        return ordenado[baixo];
+
+    }
+
+    return ordenado[baixo] + (ordenado[alto] - ordenado[baixo]) * (indice - baixo);
+
+}
+
+function assimetria(valores, m, dp){
+
+    const n = valores.length;
+
+    if(n < 4 || dp === 0){
+        return null;
+    }
+
+    const soma = valores.reduce((s, v) => s + Math.pow((v - m) / dp, 3), 0);
+
+    return (n / ((n - 1) * (n - 2))) * soma;
+
+}
+
+function curtose(valores, m, dp){
+
+    const n = valores.length;
+
+    if(n < 4 || dp === 0){
+        return null;
+    }
+
+    const soma = valores.reduce((s, v) => s + Math.pow((v - m) / dp, 4), 0);
+
+    return ((n * (n + 1)) / ((n - 1) * (n - 2) * (n - 3))) * soma
+
+        - (3 * Math.pow(n - 1, 2)) / ((n - 2) * (n - 3));
+
+}
+
+function arredondar(valor, casas = 2){
+
+    if(valor === null || valor === undefined || isNaN(valor)){
+        return "-";
+    }
+
+    return Number(valor.toFixed(casas));
+
+}
+
+function calcularEstatisticasDescritivas(valoresBrutos){
+
+    const valores = valoresBrutos.filter(v => typeof v === "number" && !isNaN(v));
+
+    if(valores.length === 0){
+
+        return null;
+
+    }
+
+    const ordenado = [...valores].sort((a,b) => a - b);
+
+    const n = valores.length;
+
+    const m = media(valores);
+
+    const dp = desvioPadrao(valores, m);
+
+    const ep = n > 0 ? dp / Math.sqrt(n) : 0;
+
+    const cv = m !== 0 ? (dp / Math.abs(m)) * 100 : 0;
+
+    const q1 = percentil(ordenado, 25);
+
+    const q3 = percentil(ordenado, 75);
+
+    return {
+
+        n,
+        media: m,
+        desvioPadrao: dp,
+        erroPadrao: ep,
+        cv,
+        mediana: mediana(ordenado),
+        moda: moda(valores),
+        min: ordenado[0],
+        max: ordenado[n - 1],
+        q1,
+        q3,
+        iiq: q3 - q1,
+        ic95min: m - 1.96 * ep,
+        ic95max: m + 1.96 * ep,
+        assimetria: assimetria(valores, m, dp),
+        curtose: curtose(valores, m, dp)
+
+    };
+
+}
 
 // ======================================================
 // VARIÁVEIS / ELEMENTOS
@@ -75,66 +261,38 @@ let escolas = [];
 
 let turmas = [];
 
-let ultimaDistribuicao = [];
+let escolaRelCientifico, turmaRelCientifico, areaRelatorioCientifico, tituloCientifico, btnExportarPdfCientifico;
 
-let escolaRelEstat, turmaRelEstat, sexoRelEstat, alunoRelEstat, areaRelatorioEstat, tituloEstatRel, secoesEstatisticas, btnExportarPdfEstat;
+let corpoCaracterizacao, corpoDescritiva, areaCategoricas, cabecalhoPorSexo, corpoPorSexo;
 
 function obterElementos(){
 
-    escolaRelEstat = document.getElementById("escolaRelEstat");
-    turmaRelEstat = document.getElementById("turmaRelEstat");
-    sexoRelEstat = document.getElementById("sexoRelEstat");
-    alunoRelEstat = document.getElementById("alunoRelEstat");
-    areaRelatorioEstat = document.getElementById("areaRelatorioEstat");
-    tituloEstatRel = document.getElementById("tituloEstatRel");
-    secoesEstatisticas = document.getElementById("secoesEstatisticas");
-    btnExportarPdfEstat = document.getElementById("btnExportarPdfEstat");
+    escolaRelCientifico = document.getElementById("escolaRelCientifico");
+    turmaRelCientifico = document.getElementById("turmaRelCientifico");
+    areaRelatorioCientifico = document.getElementById("areaRelatorioCientifico");
+    tituloCientifico = document.getElementById("tituloCientifico");
+    btnExportarPdfCientifico = document.getElementById("btnExportarPdfCientifico");
+    corpoCaracterizacao = document.getElementById("corpoCaracterizacao");
+    corpoDescritiva = document.getElementById("corpoDescritiva");
+    areaCategoricas = document.getElementById("areaCategoricas");
+    cabecalhoPorSexo = document.getElementById("cabecalhoPorSexo");
+    corpoPorSexo = document.getElementById("corpoPorSexo");
 
 }
 
 function configurarEventos(){
 
-    escolaRelEstat.addEventListener("change", async () => {
+    escolaRelCientifico.addEventListener("change", async () => {
 
-        await carregarTurmasDoFiltro();
-
-        await montarRelatorio();
-
-    });
-
-    turmaRelEstat.addEventListener("change", async () => {
-
-        await carregarAlunosDoFiltro();
+        await carregarTurmas();
 
         await montarRelatorio();
 
     });
 
-    sexoRelEstat.addEventListener("change", montarRelatorio);
+    turmaRelCientifico.addEventListener("change", montarRelatorio);
 
-    alunoRelEstat.addEventListener("change", montarRelatorio);
-
-    btnExportarPdfEstat.addEventListener("click", () => window.print());
-
-    document.querySelectorAll(".fechar-modal-estatisticas").forEach(botao=>{
-
-        botao.addEventListener("click", fecharModaisEstatisticas);
-
-    });
-
-    document.querySelectorAll(".modal-estatisticas").forEach(modal=>{
-
-        modal.addEventListener("click", (evento)=>{
-
-            if(evento.target === modal){
-
-                fecharModaisEstatisticas();
-
-            }
-
-        });
-
-    });
+    btnExportarPdfCientifico.addEventListener("click", () => window.print());
 
 }
 
@@ -149,14 +307,14 @@ export async function init(){
 }
 
 // ======================================================
-// CARREGAR ESCOLAS
+// CARREGAR ESCOLAS / TURMAS
 // ======================================================
 
 async function carregarEscolas(){
 
     escolas = [];
 
-    escolaRelEstat.innerHTML = `<option value="">Selecione...</option>`;
+    escolaRelCientifico.innerHTML = `<option value="">Selecione...</option>`;
 
     try{
 
@@ -174,7 +332,7 @@ async function carregarEscolas(){
 
             escolas.forEach(escola=>{
 
-                escolaRelEstat.innerHTML += `<option value="${escola.id}">${escola.nome}</option>`;
+                escolaRelCientifico.innerHTML += `<option value="${escola.id}">${escola.nome}</option>`;
 
             });
 
@@ -182,15 +340,13 @@ async function carregarEscolas(){
 
             const escolaId = obterEscolaId();
 
-            escolaRelEstat.innerHTML = `<option value="${escolaId}">Minha escola</option>`;
+            escolaRelCientifico.innerHTML = `<option value="${escolaId}">Minha escola</option>`;
 
-            escolaRelEstat.value = escolaId;
+            escolaRelCientifico.value = escolaId;
 
-            escolaRelEstat.disabled = true;
+            escolaRelCientifico.disabled = true;
 
-            await carregarTurmasDoFiltro();
-
-            await montarRelatorio();
+            await carregarTurmas();
 
         }
 
@@ -204,19 +360,13 @@ async function carregarEscolas(){
 
 }
 
-// ======================================================
-// CARREGAR TURMAS DO FILTRO
-// ======================================================
-
-async function carregarTurmasDoFiltro(){
+async function carregarTurmas(){
 
     turmas = [];
 
-    turmaRelEstat.innerHTML = `<option value="">Todas as turmas</option>`;
+    turmaRelCientifico.innerHTML = `<option value="">Todas as turmas</option>`;
 
-    alunoRelEstat.innerHTML = `<option value="">Ver a turma toda (distribuição)</option>`;
-
-    if(!escolaRelEstat.value){
+    if(!escolaRelCientifico.value){
 
         return;
 
@@ -224,7 +374,7 @@ async function carregarTurmasDoFiltro(){
 
     try{
 
-        const q = query(collection(db,"turmas"), where("escolaId","==",escolaRelEstat.value));
+        const q = query(collection(db,"turmas"), where("escolaId","==",escolaRelCientifico.value));
 
         const snapshot = await getDocs(q);
 
@@ -238,7 +388,7 @@ async function carregarTurmasDoFiltro(){
 
         turmas.forEach(turma=>{
 
-            turmaRelEstat.innerHTML += `<option value="${turma.id}">${turma.nome}</option>`;
+            turmaRelCientifico.innerHTML += `<option value="${turma.id}">${turma.nome}</option>`;
 
         });
 
@@ -253,319 +403,37 @@ async function carregarTurmasDoFiltro(){
 }
 
 // ======================================================
-// CARREGAR ALUNOS DO FILTRO
-// ======================================================
-
-async function carregarAlunosDoFiltro(){
-
-    alunoRelEstat.innerHTML = `<option value="">Ver a turma toda (distribuição)</option>`;
-
-    if(!turmaRelEstat.value){
-
-        return;
-
-    }
-
-    try{
-
-        const q = query(collection(db,"alunos"), where("turmaId","==",turmaRelEstat.value));
-
-        const snapshot = await getDocs(q);
-
-        const alunosDaTurma = [];
-
-        snapshot.forEach(doc=>{
-
-            alunosDaTurma.push({ id: doc.id, ...doc.data() });
-
-        });
-
-        alunosDaTurma.sort((a,b) => (a.nome || "").localeCompare(b.nome || "", "pt-BR"));
-
-        alunosDaTurma.forEach(aluno=>{
-
-            alunoRelEstat.innerHTML += `<option value="${aluno.id}">${aluno.nome}</option>`;
-
-        });
-
-    }catch(e){
-
-        console.error(e);
-
-        mostrarToast("Não foi possível carregar os alunos.", "erro");
-
-    }
-
-}
-
-// ======================================================
 // MONTAR RELATÓRIO
 // ======================================================
 
 async function montarRelatorio(){
 
-    areaRelatorioEstat.style.display = "none";
+    areaRelatorioCientifico.style.display = "none";
 
-    if(!escolaRelEstat.value){
+    if(!escolaRelCientifico.value){
 
         return;
 
     }
 
-    const escolaId = escolaRelEstat.value;
+    const escolaId = escolaRelCientifico.value;
 
-    const turmaId = turmaRelEstat.value;
-
-    const sexoFiltro = sexoRelEstat.value;
+    const turmaId = turmaRelCientifico.value;
 
     const nomeEscola = souSuperAdmin()
         ? (escolas.find(e => e.id === escolaId)?.nome || "")
-        : escolaRelEstat.options[escolaRelEstat.selectedIndex].textContent;
+        : escolaRelCientifico.options[escolaRelCientifico.selectedIndex].textContent;
 
     const nomeTurma = turmaId ? (turmas.find(t => t.id === turmaId)?.nome || "") : "Todas as turmas";
 
-    const rotuloSexo = sexoFiltro || "Ambos";
+    tituloCientifico.textContent = `${nomeEscola} — ${nomeTurma}`;
 
-    // Se um aluno específico foi escolhido, troca pro modo "posição
-    // individual" em vez da distribuição da turma inteira.
-    if(alunoRelEstat.value){
+    corpoCaracterizacao.innerHTML = `<tr><td>Carregando...</td></tr>`;
 
-        await montarRelatorioAluno(escolaId, nomeEscola, nomeTurma);
+    areaRelatorioCientifico.style.display = "block";
 
-        return;
-
-    }
-
-    tituloEstatRel.textContent = `Escola: ${nomeEscola} — Turma: ${nomeTurma} — Sexo: ${rotuloSexo}`;
-
-    secoesEstatisticas.innerHTML = "<p>Carregando...</p>";
-
-    // Mapa alunoId -> sexo, pra filtrar as avaliações por sexo (elas não
-    // gravam o sexo diretamente, só o cadastro do aluno tem isso)
-    const mapaSexoPorAluno = await carregarMapaSexo(escolaId, turmaId);
-
-    const distribuicoesPorTeste = await Promise.all(
-
-        TESTES_CONFIG.map(config => calcularDistribuicao(config, escolaId, turmaId, sexoFiltro, mapaSexoPorAluno))
-
-    );
-
-    ultimaDistribuicao = distribuicoesPorTeste;
-
-    secoesEstatisticas.innerHTML = "";
-
-    TESTES_CONFIG.forEach((config, indice)=>{
-
-        secoesEstatisticas.innerHTML += renderizarSecaoTeste(config, distribuicoesPorTeste[indice], indice);
-
-    });
-
-    areaRelatorioEstat.style.display = "block";
-
-}
-
-// ======================================================
-// MODO ALUNO ÚNICO — barra de posição em vez de distribuição
-// ======================================================
-
-async function montarRelatorioAluno(escolaId, nomeEscola, nomeTurma){
-
-    const nomeAluno = alunoRelEstat.options[alunoRelEstat.selectedIndex].textContent;
-
-    tituloEstatRel.textContent = `Escola: ${nomeEscola} — Turma: ${nomeTurma} — Aluno: ${nomeAluno}`;
-
-    secoesEstatisticas.innerHTML = "<p>Carregando...</p>";
-
-    const resultados = await Promise.all(
-
-        TESTES_CONFIG.map(config => buscarUltimoResultadoAlunoEstat(config, escolaId, alunoRelEstat.value))
-
-    );
-
-    secoesEstatisticas.innerHTML = TESTES_CONFIG
-
-        .map((config, indice) => renderizarBarraPosicaoAluno(config, resultados[indice]))
-
-        .join("");
-
-    areaRelatorioEstat.style.display = "block";
-
-}
-
-async function buscarUltimoResultadoAlunoEstat(config, escolaId, alunoId){
-
-    try{
-
-        const q = query(collection(db, config.colecao), where("escolaId","==",escolaId));
-
-        const snapshot = await getDocs(q);
-
-        const registros = [];
-
-        snapshot.forEach(doc=>{
-
-            const dados = doc.data();
-
-            if(dados.alunoId === alunoId){
-
-                registros.push(dados);
-
-            }
-
-        });
-
-        registros.sort((a,b)=>{
-
-            const dataA = a.dataTeste ? a.dataTeste.toMillis() : 0;
-
-            const dataB = b.dataTeste ? b.dataTeste.toMillis() : 0;
-
-            return dataB - dataA;
-
-        });
-
-        return registros[0] || null;
-
-    }catch(e){
-
-        console.error(`Erro ao buscar resultado de ${config.colecao}:`, e);
-
-        return null;
-
-    }
-
-}
-
-// Monta UMA barra com transição de cor (vermelho -> azul) e um
-// marcador na posição da categoria em que o aluno se encontra.
-function barraComMarcador(categorias, categoriaAtual, valorBruto){
-
-    const cores = categorias.map((_, i) => corPorPosicao(i, categorias.length));
-
-    const gradiente = `linear-gradient(to right, ${cores.join(",")})`;
-
-    const indice = categorias.indexOf(categoriaAtual);
-
-    const temMarcador = indice !== -1;
-
-    // centraliza o marcador dentro do segmento da categoria
-    const posicaoPercentual = temMarcador
-
-        ? ((indice + 0.5) / categorias.length) * 100
-
-        : 50;
-
-    const rotuloMarcador = valorBruto !== undefined && valorBruto !== null ? valorBruto : categoriaAtual;
-
-    return `
-
-        <div class="barra-posicao-container">
-
-            <div class="barra-posicao-trilha" style="background:${gradiente}">
-
-                ${temMarcador ? `
-
-                    <div class="marcador-posicao" style="left:${posicaoPercentual}%" title="${categoriaAtual}${valorBruto !== undefined && valorBruto !== null ? ` — ${valorBruto}` : ""}">
-                        <span class="marcador-posicao-valor">${rotuloMarcador}</span>
-                    </div>
-
-                ` : ""}
-
-            </div>
-
-            <div class="barra-posicao-legendas">
-
-                ${categorias.map(c => `<span>${c}</span>`).join("")}
-
-            </div>
-
-            <div class="barra-posicao-resultado">
-
-                ${temMarcador ? `Resultado: <strong>${valorBruto !== undefined && valorBruto !== null ? valorBruto + " — " : ""}${categoriaAtual}</strong>` : "Sem avaliação registrada"}
-
-            </div>
-
-        </div>
-
-    `;
-
-}
-
-// Pega o valor numérico principal do registro (o que faz mais sentido
-// mostrar como "resultado bruto" varia de teste pra teste)
-function valorBrutoDoRegistro(registro, colecao){
-
-    if(!registro){
-        return null;
-    }
-
-    const camposPorColecao = {
-
-        avaliacoes_leger: { campo:"vo2max", sufixo:" VO₂máx" },
-        avaliacoes_imc: { campo:"imc", sufixo:" IMC" },
-        avaliacoes_flexibilidade: { campo:"distanciaCm", sufixo:" cm" },
-        avaliacoes_abdominal: { campo:"repeticoes", sufixo:" rep." },
-        avaliacoes_medicineball: { campo:"distanciaCm", sufixo:" cm" },
-        avaliacoes_saltohorizontal: { campo:"distanciaCm", sufixo:" cm" },
-        avaliacoes_agilidade: { campo:"tempoSegundos", sufixo:" s" },
-        avaliacoes_corrida20m: { campo:"tempoSegundos", sufixo:" s" },
-        avaliacoes_corrida6min: { campo:"distanciaM", sufixo:" m" }
-
-    };
-
-    const config = camposPorColecao[colecao];
-
-    if(!config || registro[config.campo] === undefined || registro[config.campo] === null){
-        return null;
-    }
-
-    return `${registro[config.campo]}${config.sufixo}`;
-
-}
-
-function renderizarBarraPosicaoAluno(config, registro){
-
-    const categoriaDesempenho = registro ? registro[config.campo] : null;
-
-    const valorBruto = valorBrutoDoRegistro(registro, config.colecao);
-
-    let html = `
-
-        <div class="card">
-            <h3>${config.titulo}</h3>
-            ${barraComMarcador(config.categorias, categoriaDesempenho, valorBruto)}
-
-    `;
-
-    if(config.campoSaude && registro){
-
-        const categoriaSaude = registro[config.campoSaude];
-
-        html += `
-
-            <div style="margin-top:16px;">
-                <span style="font-size:12px; color:#94a3b8; font-weight:600;">SAÚDE</span>
-                ${barraComMarcador(config.categoriasSaude, categoriaSaude, valorBruto)}
-            </div>
-
-        `;
-
-    }
-
-    html += `</div>`;
-
-    return html;
-
-}
-
-// ======================================================
-// MAPA alunoId -> sexo (escopado pela escola ou pela turma,
-// se uma turma específica estiver selecionada)
-// ======================================================
-
-async function carregarMapaSexo(escolaId, turmaId){
-
-    const mapa = new Map();
+    // 1) Alunos da amostra
+    let alunos = [];
 
     try{
 
@@ -575,114 +443,11 @@ async function carregarMapaSexo(escolaId, turmaId){
 
         snapshot.forEach(doc=>{
 
-            const dados = doc.data();
-
-            if(turmaId && dados.turmaId !== turmaId){
-
-                return;
-
-            }
-
-            mapa.set(doc.id, dados.sexo || "");
-
-        });
-
-    }catch(e){
-
-        console.error("Erro ao carregar sexo dos alunos:", e);
-
-    }
-
-    return mapa;
-
-}
-
-// ======================================================
-// CALCULAR DISTRIBUIÇÃO (resultado mais recente por aluno)
-// ======================================================
-
-async function calcularDistribuicao(config, escolaId, turmaId, sexoFiltro, mapaSexoPorAluno){
-
-    const contagens = {};
-
-    const alunosPorCategoria = {};
-
-    config.categorias.forEach(cat => {
-
-        contagens[cat] = 0;
-
-        alunosPorCategoria[cat] = [];
-
-    });
-
-    let totalAlunos = 0;
-
-    try{
-
-        const q = query(collection(db, config.colecao), where("escolaId","==",escolaId));
-
-        const snapshot = await getDocs(q);
-
-        const registros = [];
-
-        snapshot.forEach(doc => {
-
-            const dados = doc.data();
+            const dados = { id: doc.id, ...doc.data() };
 
             if(!turmaId || dados.turmaId === turmaId){
 
-                registros.push(dados);
-
-            }
-
-        });
-
-        // mais recente primeiro
-        registros.sort((a,b)=>{
-
-            const dataA = a.dataTeste ? a.dataTeste.toMillis() : 0;
-
-            const dataB = b.dataTeste ? b.dataTeste.toMillis() : 0;
-
-            return dataB - dataA;
-
-        });
-
-        // só o primeiro registro (mais recente) de cada aluno conta
-        const jaContados = new Set();
-
-        registros.forEach(registro=>{
-
-            if(jaContados.has(registro.alunoId)){
-
-                return;
-
-            }
-
-            // filtro de sexo: só aplica se um sexo específico foi escolhido
-            if(sexoFiltro && mapaSexoPorAluno.get(registro.alunoId) !== sexoFiltro){
-
-                return;
-
-            }
-
-            jaContados.add(registro.alunoId);
-
-            const categoria = registro[config.campo];
-
-            if(categoria && Object.prototype.hasOwnProperty.call(contagens, categoria)){
-
-                contagens[categoria]++;
-
-                alunosPorCategoria[categoria].push({
-
-                    alunoId: registro.alunoId,
-                    nome: registro.nome || "-",
-                    registro
-
-                });
-
-                totalAlunos++;
+                alunos.push(dados);
 
             }
 
@@ -690,181 +455,389 @@ async function calcularDistribuicao(config, escolaId, turmaId, sexoFiltro, mapaS
 
     }catch(e){
 
-        console.error(`Erro ao calcular distribuição de ${config.colecao}:`, e);
+        console.error(e);
+
+        mostrarToast("Não foi possível carregar os alunos.", "erro");
+
+        return;
 
     }
 
-    return { contagens, alunosPorCategoria, totalAlunos };
+    if(alunos.length === 0){
+
+        corpoCaracterizacao.innerHTML = `<tr><td>Nenhum aluno encontrado nessa amostra.</td></tr>`;
+
+        corpoDescritiva.innerHTML = "";
+
+        areaCategoricas.innerHTML = "";
+
+        corpoPorSexo.innerHTML = "";
+
+        return;
+
+    }
+
+    const idsAlunos = new Set(alunos.map(a => a.id));
+
+    // 2) Busca os valores numéricos de cada variável (escopados pela escola,
+    // filtrados por turma no navegador quando aplicável)
+    const valoresPorVariavel = await buscarValoresDasVariaveis(escolaId, idsAlunos, alunos);
+
+    // 3) Busca as classificações categóricas de cada teste
+    const categoriasPorTeste = await buscarCategoriasDosTestes(escolaId, idsAlunos);
+
+    // 4) Renderiza as 4 tabelas
+    renderizarCaracterizacaoAmostra(alunos, valoresPorVariavel);
+
+    renderizarEstatisticaDescritiva(valoresPorVariavel);
+
+    renderizarVariaveisCategoricas(categoriasPorTeste);
+
+    renderizarComparacaoPorSexo(alunos, valoresPorVariavel);
 
 }
 
 // ======================================================
-// COR DA BARRA — vermelho (pior) até azul (melhor),
-// passando por laranja/amarelo/verde no meio do caminho.
+// BUSCAR VALORES DAS VARIÁVEIS NUMÉRICAS
+// Retorna um Map: título da variável -> [{ alunoId, valor }]
+// (mais recente por aluno, quando vem de avaliação)
 // ======================================================
 
-function corPorPosicao(indice, totalCategorias){
+async function buscarValoresDasVariaveis(escolaId, idsAlunos, alunos){
 
-    if(totalCategorias <= 1){
+    const resultado = new Map();
 
-        return "hsl(210, 75%, 50%)";
+    // Idade: não vem de avaliação, vem direto do cadastro
+    const idades = alunos
 
-    }
+        .filter(a => a.dataNascimento)
 
-    const posicao = indice / (totalCategorias - 1);
+        .map(a => ({ alunoId: a.id, valor: calcularIdade(a.dataNascimento) }))
 
-    const matiz = Math.round(0 + (210 - 0) * posicao);
+        .filter(item => typeof item.valor === "number");
 
-    return `hsl(${matiz}, 75%, 48%)`;
+    resultado.set("Idade (anos)", idades);
+
+    // Demais variáveis: vêm de avaliação (mais recente por aluno)
+    const variaveisDeAvaliacao = VARIAVEIS_NUMERICAS.filter(v => v.origem !== "aluno");
+
+    await Promise.all(variaveisDeAvaliacao.map(async (variavel)=>{
+
+        try{
+
+            const q = query(collection(db, variavel.colecao), where("escolaId","==",escolaId));
+
+            const snapshot = await getDocs(q);
+
+            const registrosPorAluno = new Map();
+
+            snapshot.forEach(doc=>{
+
+                const dados = doc.data();
+
+                if(!idsAlunos.has(dados.alunoId)){
+
+                    return;
+
+                }
+
+                if(!registrosPorAluno.has(dados.alunoId)){
+
+                    registrosPorAluno.set(dados.alunoId, []);
+
+                }
+
+                registrosPorAluno.get(dados.alunoId).push(dados);
+
+            });
+
+            const valores = [];
+
+            registrosPorAluno.forEach((registros, alunoId)=>{
+
+                registros.sort((a,b)=>{
+
+                    const dataA = a.dataTeste ? a.dataTeste.toMillis() : 0;
+
+                    const dataB = b.dataTeste ? b.dataTeste.toMillis() : 0;
+
+                    return dataB - dataA;
+
+                });
+
+                const valor = registros[0][variavel.campo];
+
+                if(typeof valor === "number"){
+
+                    valores.push({ alunoId, valor });
+
+                }
+
+            });
+
+            resultado.set(variavel.titulo, valores);
+
+        }catch(e){
+
+            console.error(`Erro ao buscar ${variavel.colecao}:`, e);
+
+            resultado.set(variavel.titulo, []);
+
+        }
+
+    }));
+
+    return resultado;
 
 }
 
 // ======================================================
-// RENDERIZAR SEÇÃO DE UM TESTE
+// BUSCAR CATEGORIAS DOS TESTES (pra Tabela 3)
 // ======================================================
 
-function renderizarSecaoTeste(config, { contagens, totalAlunos }, indiceTeste){
+async function buscarCategoriasDosTestes(escolaId, idsAlunos){
 
-    if(totalAlunos === 0){
+    const resultado = [];
 
-        return `
+    await Promise.all(TESTES_CATEGORICOS.map(async (teste)=>{
 
-            <div class="card">
-                <h3>${config.titulo}</h3>
-                <p style="color:#94a3b8">Nenhum aluno avaliado nesse teste ainda.</p>
-            </div>
+        try{
 
-        `;
+            const q = query(collection(db, teste.colecao), where("escolaId","==",escolaId));
 
-    }
+            const snapshot = await getDocs(q);
 
-    const barras = config.categorias.map((categoria, indiceCategoria)=>{
+            const registrosPorAluno = new Map();
 
-        const qtd = contagens[categoria];
+            snapshot.forEach(doc=>{
 
-        const percentual = totalAlunos > 0 ? Math.round((qtd / totalAlunos) * 100) : 0;
+                const dados = doc.data();
 
-        const cor = corPorPosicao(indiceCategoria, config.categorias.length);
+                if(!idsAlunos.has(dados.alunoId)){
 
-        return `
+                    return;
 
-            <div class="linha-barra ${qtd > 0 ? "linha-barra-clicavel" : ""}"
-                 ${qtd > 0 ? `onclick="window.abrirAlunosNivel(${indiceTeste}, '${categoria.replace(/'/g,"\\'")}')"` : ""}>
-                <span class="rotulo-barra">${categoria}</span>
-                <div class="trilha-barra">
-                    <div class="preenchimento-barra" style="width:${percentual}%; background:${cor};"></div>
-                </div>
-                <span class="valor-barra">${qtd} aluno(s) (${percentual}%)</span>
-            </div>
+                }
 
-        `;
+                if(!registrosPorAluno.has(dados.alunoId)){
 
-    }).join("");
+                    registrosPorAluno.set(dados.alunoId, []);
 
-    return `
+                }
 
-        <div class="card">
-            <h3>${config.titulo} <span style="font-weight:400; color:#94a3b8; font-size:14px">— ${totalAlunos} aluno(s) avaliado(s)</span></h3>
-            ${barras}
-        </div>
+                registrosPorAluno.get(dados.alunoId).push(dados);
+
+            });
+
+            const contagens = {};
+
+            teste.categorias.forEach(c => contagens[c] = 0);
+
+            let total = 0;
+
+            registrosPorAluno.forEach(registros=>{
+
+                registros.sort((a,b)=>{
+
+                    const dataA = a.dataTeste ? a.dataTeste.toMillis() : 0;
+
+                    const dataB = b.dataTeste ? b.dataTeste.toMillis() : 0;
+
+                    return dataB - dataA;
+
+                });
+
+                const categoria = registros[0][teste.campo];
+
+                if(categoria && Object.prototype.hasOwnProperty.call(contagens, categoria)){
+
+                    contagens[categoria]++;
+
+                    total++;
+
+                }
+
+            });
+
+            resultado.push({ titulo: teste.titulo, categorias: teste.categorias, contagens, total });
+
+        }catch(e){
+
+            console.error(`Erro ao buscar categorias de ${teste.colecao}:`, e);
+
+        }
+
+    }));
+
+    // mantém a ordem original de TESTES_CATEGORICOS
+    return TESTES_CATEGORICOS.map(t => resultado.find(r => r.titulo === t.titulo)).filter(Boolean);
+
+}
+
+// ======================================================
+// TABELA 1: CARACTERIZAÇÃO DA AMOSTRA
+// ======================================================
+
+function renderizarCaracterizacaoAmostra(alunos, valoresPorVariavel){
+
+    const n = alunos.length;
+
+    const masculino = alunos.filter(a => (a.sexo || "").toLowerCase().startsWith("m")).length;
+
+    const feminino = alunos.filter(a => (a.sexo || "").toLowerCase().startsWith("f")).length;
+
+    const idades = (valoresPorVariavel.get("Idade (anos)") || []).map(item => item.valor);
+
+    const statsIdade = calcularEstatisticasDescritivas(idades);
+
+    const turmasDaAmostra = [...new Set(alunos.map(a => a.turmaId))].length;
+
+    corpoCaracterizacao.innerHTML = `
+
+        <tr><td><strong>N (tamanho da amostra)</strong></td><td>${n}</td></tr>
+        <tr><td><strong>Sexo — Masculino</strong></td><td>${masculino} (${n > 0 ? Math.round((masculino/n)*100) : 0}%)</td></tr>
+        <tr><td><strong>Sexo — Feminino</strong></td><td>${feminino} (${n > 0 ? Math.round((feminino/n)*100) : 0}%)</td></tr>
+        <tr><td><strong>Idade — Média ± DP</strong></td><td>${statsIdade ? `${arredondar(statsIdade.media)} ± ${arredondar(statsIdade.desvioPadrao)} anos` : "-"}</td></tr>
+        <tr><td><strong>Idade — Mín-Máx</strong></td><td>${statsIdade ? `${arredondar(statsIdade.min)} - ${arredondar(statsIdade.max)} anos` : "-"}</td></tr>
+        <tr><td><strong>Nº de turmas na amostra</strong></td><td>${turmasDaAmostra}</td></tr>
 
     `;
 
 }
 
 // ======================================================
-// POP-UP 1: ALUNOS DE UM NÍVEL
+// TABELA 2: ESTATÍSTICA DESCRITIVA
 // ======================================================
 
-window.abrirAlunosNivel = function(indiceTeste, categoria){
+function renderizarEstatisticaDescritiva(valoresPorVariavel){
 
-    const config = TESTES_CONFIG[indiceTeste];
+    corpoDescritiva.innerHTML = VARIAVEIS_NUMERICAS.map(variavel=>{
 
-    const distribuicao = ultimaDistribuicao[indiceTeste];
+        const valores = (valoresPorVariavel.get(variavel.titulo) || []).map(item => item.valor);
 
-    if(!config || !distribuicao){
+        const stats = calcularEstatisticasDescritivas(valores);
 
-        return;
+        if(!stats){
 
-    }
+            return `<tr><td>${variavel.titulo}</td><td colspan="15" style="color:#94a3b8">Sem dados suficientes</td></tr>`;
 
-    const alunosDoNivel = distribuicao.alunosPorCategoria[categoria] || [];
+        }
 
-    const modal = document.getElementById("modalAlunosNivel");
+        return `
 
-    document.getElementById("tituloModalAlunosNivel").textContent = `${config.titulo} — ${categoria}`;
+            <tr>
+                <td>${variavel.titulo}</td>
+                <td>${stats.n}</td>
+                <td>${arredondar(stats.media)}</td>
+                <td>${arredondar(stats.desvioPadrao)}</td>
+                <td>${arredondar(stats.erroPadrao)}</td>
+                <td>${arredondar(stats.cv)}</td>
+                <td>${arredondar(stats.mediana)}</td>
+                <td>${stats.moda}</td>
+                <td>${arredondar(stats.min)}</td>
+                <td>${arredondar(stats.max)}</td>
+                <td>${arredondar(stats.q1)}</td>
+                <td>${arredondar(stats.q3)}</td>
+                <td>${arredondar(stats.iiq)}</td>
+                <td>${arredondar(stats.ic95min)} - ${arredondar(stats.ic95max)}</td>
+                <td>${stats.assimetria !== null ? arredondar(stats.assimetria) : "-"}</td>
+                <td>${stats.curtose !== null ? arredondar(stats.curtose) : "-"}</td>
+            </tr>
 
-    document.getElementById("subtituloModalAlunosNivel").textContent =
+        `;
 
-        `${alunosDoNivel.length} aluno(s). Clique num nome pra ver a avaliação completa.`;
+    }).join("");
 
-    document.getElementById("listaModalAlunosNivel").innerHTML = alunosDoNivel
-
-        .map((a, indiceAluno) => `
-
-            <li onclick="window.abrirDetalheAvaliacao(${indiceTeste}, '${categoria.replace(/'/g,"\\'")}', ${indiceAluno})">
-                ${a.nome}
-            </li>
-
-        `).join("") || "<li style='cursor:default'>Nenhum aluno.</li>";
-
-    modal.classList.add("show");
-
-};
+}
 
 // ======================================================
-// POP-UP 2: DETALHE DA AVALIAÇÃO DE UM ALUNO
+// TABELA 3: VARIÁVEIS CATEGÓRICAS
 // ======================================================
 
-window.abrirDetalheAvaliacao = function(indiceTeste, categoria, indiceAluno){
+function renderizarVariaveisCategoricas(categoriasPorTeste){
 
-    const config = TESTES_CONFIG[indiceTeste];
+    areaCategoricas.innerHTML = categoriasPorTeste.map(teste=>{
 
-    const distribuicao = ultimaDistribuicao[indiceTeste];
+        if(teste.total === 0){
 
-    const aluno = distribuicao?.alunosPorCategoria[categoria]?.[indiceAluno];
+            return `<h4 style="margin-top:14px;">${teste.titulo}</h4><p style="color:#94a3b8">Sem dados.</p>`;
 
-    if(!aluno){
+        }
 
-        return;
+        let acumulado = 0;
 
-    }
+        const linhas = teste.categorias.map(categoria=>{
 
-    const registro = aluno.registro;
+            const qtd = teste.contagens[categoria];
 
-    const data = registro.dataTeste ? registro.dataTeste.toDate().toLocaleDateString("pt-BR") : "-";
+            const percentual = (qtd / teste.total) * 100;
 
-    // Mostra todo campo do registro que pareça relevante (ignora os
-    // campos de controle/vínculo, que não interessam nessa tela)
-    const camposIgnorados = ["alunoId","nome","codigoSAFE","turmaId","escolaId","professorId","origem","dataTeste","criadoEm","atualizadoEm"];
+            acumulado += percentual;
 
-    const linhasDetalhe = Object.entries(registro)
+            return `
 
-        .filter(([chave]) => !camposIgnorados.includes(chave))
+                <tr>
+                    <td>${categoria}</td>
+                    <td>${qtd}</td>
+                    <td>${arredondar(percentual, 1)}%</td>
+                    <td>${arredondar(acumulado, 1)}%</td>
+                </tr>
 
-        .map(([chave, valor]) => `
+            `;
 
-            <div class="linha-resultado">
-                <span>${chave}</span>
-                <span>${valor ?? "-"}</span>
-            </div>
+        }).join("");
 
-        `).join("");
+        return `
 
-    document.getElementById("tituloModalDetalheAvaliacao").textContent = `${aluno.nome} — ${config.titulo}`;
+            <h4 style="margin-top:14px;">${teste.titulo} <span style="font-weight:400; color:#94a3b8; font-size:13px;">(N=${teste.total})</span></h4>
 
-    document.getElementById("subtituloModalDetalheAvaliacao").textContent = `Avaliação de ${data}`;
+            <table class="table">
+                <thead>
+                    <tr><th>Categoria</th><th>Freq. Absoluta</th><th>Freq. Relativa</th><th>% Acumulado</th></tr>
+                </thead>
+                <tbody>${linhas}</tbody>
+            </table>
 
-    document.getElementById("corpoModalDetalheAvaliacao").innerHTML = linhasDetalhe;
+        `;
 
-    document.getElementById("modalDetalheAvaliacao").classList.add("show");
+    }).join("");
 
-};
+}
 
-function fecharModaisEstatisticas(){
+// ======================================================
+// TABELA 4: COMPARAÇÃO POR SEXO
+// ======================================================
 
-    document.getElementById("modalAlunosNivel")?.classList.remove("show");
+function renderizarComparacaoPorSexo(alunos, valoresPorVariavel){
 
-    document.getElementById("modalDetalheAvaliacao")?.classList.remove("show");
+    const idsMasculino = new Set(alunos.filter(a => (a.sexo || "").toLowerCase().startsWith("m")).map(a => a.id));
+
+    const idsFeminino = new Set(alunos.filter(a => (a.sexo || "").toLowerCase().startsWith("f")).map(a => a.id));
+
+    cabecalhoPorSexo.innerHTML = `<th>Variável</th><th>Masculino (média ± DP)</th><th>Feminino (média ± DP)</th>`;
+
+    corpoPorSexo.innerHTML = VARIAVEIS_NUMERICAS.map(variavel=>{
+
+        const todosOsValores = valoresPorVariavel.get(variavel.titulo) || [];
+
+        const valoresM = todosOsValores.filter(item => idsMasculino.has(item.alunoId)).map(item => item.valor);
+
+        const valoresF = todosOsValores.filter(item => idsFeminino.has(item.alunoId)).map(item => item.valor);
+
+        const statsM = calcularEstatisticasDescritivas(valoresM);
+
+        const statsF = calcularEstatisticasDescritivas(valoresF);
+
+        return `
+
+            <tr>
+                <td>${variavel.titulo}</td>
+                <td>${statsM ? `${arredondar(statsM.media)} ± ${arredondar(statsM.desvioPadrao)} (n=${statsM.n})` : "-"}</td>
+                <td>${statsF ? `${arredondar(statsF.media)} ± ${arredondar(statsF.desvioPadrao)} (n=${statsF.n})` : "-"}</td>
+            </tr>
+
+        `;
+
+    }).join("");
 
 }

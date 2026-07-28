@@ -23,7 +23,13 @@
 
     flex-direction:column;
 
-    min-height:100vh;
+    height:100vh;
+
+    position:sticky;
+
+    top:0;
+
+    overflow-y:auto;
 
     box-shadow:4px 0 10px rgba(0,0,0,.12);
 
@@ -84,6 +90,8 @@
         top:0;
 
         left:0;
+
+        height:100vh;
 
         z-index:999;
 
@@ -251,34 +259,6 @@
     background:#455A64;
 
     border-radius:20px;
-
-}
-
-/* ===========================
-   RESPONSIVO
-=========================== */
-
-@media(max-width:900px){
-
-    .sidebar{
-
-        position:fixed;
-
-        left:-270px;
-
-        top:0;
-
-        z-index:999;
-
-        transition:.3s;
-
-    }
-
-    .sidebar.show{
-
-        left:0;
-
-    }
 
 }
 

@@ -25,9 +25,13 @@
 
     height:100vh;
 
-    position:sticky;
+    position:fixed;
 
     top:0;
+
+    left:0;
+
+    z-index:900;
 
     overflow-y:auto;
 
@@ -114,6 +118,12 @@
     .container{
 
         display:block;
+
+    }
+
+    .main{
+
+        margin-left:0;
 
     }
 }

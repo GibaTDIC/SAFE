@@ -1,0 +1,119 @@
+<div class="page avaliacao-campo" id="paginaCC" style="--cor-teste:#0891B2">
+
+    <div class="cabecalho-teste">
+
+        <div class="cabecalho-teste-icone" id="iconeTesteContainer"></div>
+
+        <div class="cabecalho-teste-info">
+
+            <h1>Perímetro da Cintura</h1>
+
+            <p>Razão Cintura-Estatura (RCE) — estimativa de gordura visceral, protocolo PROESP-BR</p>
+
+            <div class="cabecalho-teste-meta">
+                <span>👤 <strong id="metaProfessor">-</strong></span>
+                <span>🏫 Turma: <strong id="metaTurma">-</strong></span>
+                <span>👥 <strong id="metaQtdAlunos">-</strong> alunos</span>
+                <span>📅 <strong id="metaData">-</strong></span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <button id="btnComoExecutar" class="btn-como-executar">
+        ▶ Como executar este teste
+    </button>
+
+    <div class="info-teste-resumo">
+        <span><strong>Registrar:</strong> cintura (cm) e estatura (cm)</span>
+        <span><strong>Calculado automaticamente:</strong> RCE e classificação</span>
+        <span><strong>Ponto de corte:</strong> RCE 0,50 (igual pra qualquer idade/sexo)</span>
+    </div>
+
+    <div class="card no-print" id="cardSelecionarTurma">
+
+        <label>Turma</label>
+
+        <select id="turmaCC" class="form-control">
+            <option value="">Selecione a turma...</option>
+        </select>
+
+    </div>
+
+    <div id="areaProgresso" class="barra-progresso-container" style="display:none">
+
+        <div class="barra-progresso-topo">
+            <span id="progressoTurmaNome"></span>
+            <span id="progressoContagem"></span>
+        </div>
+
+        <div class="barra-progresso-trilha">
+            <div id="progressoPreenchimento" class="barra-progresso-preenchimento"></div>
+        </div>
+
+        <div class="barra-progresso-status">
+            <span class="status-pill status-concluido">✔ <span id="qtdConcluidos">0</span> concluídos</span>
+            <span class="status-pill status-pendente">⏳ <span id="qtdPendentes">0</span> pendentes</span>
+            <span class="status-pill status-ausente">❌ <span id="qtdAusentes">0</span> ausentes</span>
+        </div>
+
+    </div>
+
+    <div id="areaFiltros" class="painel-filtros no-print" style="display:none">
+
+        <input type="text" id="buscaAlunoCC" class="form-control" placeholder="🔎 Buscar aluno por nome...">
+
+        <div class="filtros-situacao" id="filtrosSituacaoCC">
+            <button data-filtro="todos" class="filtro-situacao ativo">Todos</button>
+            <button data-filtro="pendente" class="filtro-situacao">Pendentes</button>
+            <button data-filtro="concluido" class="filtro-situacao">Concluídos</button>
+            <button data-filtro="ausente" class="filtro-situacao">Ausentes</button>
+            <button data-filtro="risco" class="filtro-situacao">Em risco</button>
+        </div>
+
+        <select id="ordenacaoCC" class="form-control" style="max-width:220px;">
+            <option value="alfabetica">Ordem alfabética</option>
+            <option value="chamada">Número da chamada</option>
+        </select>
+
+        <div class="navegacao-alunos">
+            <button id="btnAlunoAnterior" class="btn-secondary">◀ Anterior</button>
+            <button id="btnProximoAluno" class="btn-secondary">Próximo ▶</button>
+        </div>
+
+    </div>
+
+    <div id="gridAlunosCC" class="grid-cards-alunos"></div>
+
+</div>
+
+<div id="painelHistoricoLateral" class="painel-lateral">
+
+    <div class="painel-lateral-topo">
+        <h3 id="tituloHistoricoLateral">Histórico</h3>
+        <button id="fecharHistoricoLateral" type="button">&times;</button>
+    </div>
+
+    <div id="corpoHistoricoLateral" class="painel-lateral-corpo"></div>
+
+</div>
+
+<div id="fundoPainelLateral" class="fundo-painel-lateral"></div>
+
+<div id="modalValidacaoCC" class="modal">
+
+    <div class="modal-content" style="max-width:380px; text-align:center;">
+
+        <h3>⚠️ Valor fora da faixa esperada</h3>
+
+        <p id="mensagemValidacaoCC" style="margin:14px 0; color:#475569;"></p>
+
+        <div style="display:flex; gap:10px;">
+            <button id="btnCancelarValidacaoCC" class="btn-secondary" style="flex:1;">Corrigir</button>
+            <button id="btnConfirmarValidacaoCC" class="btn btn-primary" style="flex:1;">Confirmar assim mesmo</button>
+        </div>
+
+    </div>
+
+</div>

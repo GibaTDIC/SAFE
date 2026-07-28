@@ -1,0 +1,712 @@
+/* ==========================================================
+   SAFE - Sistema de Avaliação Física Escolar
+   Arquivo: aluno.css
+   Depende de global.css (variáveis, form-control, botão)
+========================================================== */
+
+body{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    justify-content:center;
+
+    min-height:100vh;
+
+    background:var(--cor-fundo, #EEF3F8);
+
+    padding:30px 20px;
+
+}
+
+.formulario{
+
+    width:100%;
+
+    max-width:560px;
+
+}
+
+.formulario h2{
+
+    text-align:center;
+
+    color:var(--cor-primaria, #1565C0);
+
+    margin-bottom:8px;
+
+}
+
+.subtitulo{
+
+    text-align:center;
+
+    color:#64748b;
+
+    font-size:14px;
+
+    margin-bottom:24px;
+
+}
+
+.area-testes{
+
+    margin-top:10px;
+
+    padding-top:20px;
+
+    border-top:1px solid var(--borda, #D9E2EC);
+
+}
+
+.area-testes h3{
+
+    margin-bottom:16px;
+
+    color:var(--cor-texto, #263238);
+
+}
+
+.formulario button{
+
+    width:100%;
+
+}
+
+#areaMeusResultados{
+
+    margin-top:24px;
+
+    padding-top:20px;
+
+    border-top:1px solid var(--borda, #D9E2EC);
+
+}
+
+#areaMeusResultados h3{
+
+    color:var(--cor-texto, #263238);
+
+    margin-bottom:4px;
+
+}
+
+.resultado-teste{
+
+    background:#F8FAFC;
+
+    border-radius:8px;
+
+    padding:14px 16px;
+
+    margin-bottom:10px;
+
+    font-size:14px;
+
+}
+
+.resultado-teste .titulo-resultado{
+
+    font-weight:600;
+
+    color:var(--cor-primaria, #1565C0);
+
+    margin-bottom:6px;
+
+}
+
+.resultado-teste .linha-resultado{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    color:#475569;
+
+    padding:2px 0;
+
+}
+
+.link-voltar{
+
+    display:block;
+
+    text-align:center;
+
+    margin-top:20px;
+
+    font-size:14px;
+
+    color:#64748b;
+
+    text-decoration:none;
+
+}
+
+.link-voltar:hover{
+
+    color:var(--cor-primaria, #1565C0);
+
+    text-decoration:underline;
+
+}
+
+.identificacao-aluno{
+
+    background:#DCFCE7;
+
+    color:#166534;
+
+    border:1px solid #86EFAC;
+
+    border-radius:10px;
+
+    padding:10px 14px;
+
+    font-size:13.5px;
+
+    margin:14px 0;
+
+}
+
+/* ===========================
+   WIZARD DO PORTAL DO ALUNO
+=========================== */
+
+.corpo-wizard-aluno{
+
+    background:linear-gradient(160deg, #EFF6FF, #F8FAFC);
+
+    min-height:100vh;
+
+}
+
+.container-wizard-aluno{
+
+    max-width:720px;
+
+    margin:0 auto;
+
+    padding:20px;
+
+}
+
+.etapa-aluno{
+
+    display:none;
+
+    min-height:calc(100vh - 40px);
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+.etapa-aluno-conteudo{
+
+    width:100%;
+
+    background:#FFF;
+
+    border-radius:var(--radius, 16px);
+
+    box-shadow:var(--sombra-forte, 0 8px 24px rgba(30,41,59,.08));
+
+    padding:32px 28px;
+
+    text-align:center;
+
+}
+
+.etapa-larga{
+
+    max-width:100%;
+
+    text-align:left;
+}
+
+.etapa-larga h2{
+
+    text-align:center;
+}
+
+.etapa-centralizada h2{
+
+    margin-top:10px;
+
+}
+
+.emoji-gigante{
+
+    font-size:64px;
+
+    line-height:1;
+
+}
+
+.texto-wizard{
+
+    color:#64748b;
+
+    font-size:15px;
+
+    margin:8px 0;
+
+}
+
+.texto-wizard-destaque{
+
+    color:var(--cor-primaria, #2563EB);
+
+    font-weight:800;
+
+    font-size:16px;
+
+    margin-top:10px;
+}
+
+.btn-gigante-wizard{
+
+    display:block;
+
+    width:100%;
+
+    max-width:340px;
+
+    margin:20px auto 0;
+
+    background:var(--cor-primaria, #2563EB);
+
+    color:#FFF;
+
+    border:none;
+
+    padding:18px;
+
+    border-radius:16px;
+
+    font-size:18px;
+
+    font-weight:800;
+
+    cursor:pointer;
+
+    box-shadow:0 8px 20px rgba(37,99,235,.3);
+
+    transition:.2s;
+}
+
+.btn-gigante-wizard:hover{
+
+    transform:translateY(-2px);
+
+}
+
+.btn-secundario-wizard{
+
+    display:block;
+
+    width:100%;
+
+    max-width:340px;
+
+    margin:16px auto 0;
+
+    background:#F1F5F9;
+
+    color:#334155;
+
+    border:none;
+
+    padding:14px;
+
+    border-radius:14px;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+}
+
+.btn-voltar-wizard{
+
+    display:block;
+
+    margin:20px auto 0;
+
+    background:none;
+
+    border:none;
+
+    color:#94a3b8;
+
+    font-size:14px;
+
+    cursor:pointer;
+}
+
+.progresso-etapas{
+
+    margin-bottom:20px;
+
+    font-size:13px;
+
+    color:#94a3b8;
+
+    font-weight:700;
+}
+
+.barra-etapas{
+
+    height:8px;
+
+    background:#E2E8F0;
+
+    border-radius:8px;
+
+    overflow:hidden;
+
+    margin-top:6px;
+}
+
+.barra-etapas-preenchimento{
+
+    height:100%;
+
+    background:var(--cor-primaria, #2563EB);
+
+    transition:width .3s;
+}
+
+.select-wizard{
+
+    font-size:18px;
+
+    padding:16px;
+
+    margin:20px 0;
+
+    text-align:center;
+}
+
+.lista-nomes-aluno{
+
+    max-height:50vh;
+
+    overflow-y:auto;
+
+    margin:16px 0;
+
+    border-radius:12px;
+
+    border:1px solid var(--borda, #E2E8F0);
+}
+
+.item-nome-aluno{
+
+    padding:16px;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    text-align:center;
+
+    border-bottom:1px solid #F1F5F9;
+
+    cursor:pointer;
+
+    transition:.15s;
+}
+
+.item-nome-aluno:last-child{
+
+    border-bottom:none;
+}
+
+.item-nome-aluno:hover{
+
+    background:#EFF6FF;
+
+    color:var(--cor-primaria, #2563EB);
+}
+
+.cartao-identificacao-aluno{
+
+    background:#EFF6FF;
+
+    border-radius:16px;
+
+    padding:24px;
+
+    margin-bottom:10px;
+}
+
+.cartao-identificacao-aluno h2{
+
+    margin:10px 0 4px;
+}
+
+.grid-cards-testes-aluno{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+
+    gap:14px;
+
+    margin:20px 0;
+}
+
+.card-teste-aluno{
+
+    background:#FFF;
+
+    border:2px solid var(--borda, #E2E8F0);
+
+    border-radius:16px;
+
+    padding:18px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.card-teste-aluno:hover{
+
+    border-color:var(--cor-primaria, #2563EB);
+
+    transform:translateY(-3px);
+
+    box-shadow:0 8px 20px rgba(37,99,235,.15);
+}
+
+.card-teste-aluno.concluido{
+
+    background:#F0FDF4;
+
+    border-color:#86EFAC;
+}
+
+.card-teste-aluno-icone{
+
+    font-size:36px;
+
+    margin-bottom:8px;
+}
+
+.card-teste-aluno h3{
+
+    font-size:15px;
+
+    margin-bottom:6px;
+}
+
+.card-teste-aluno-descricao{
+
+    font-size:12.5px;
+
+    color:#94a3b8;
+
+    margin-bottom:10px;
+
+    min-height:36px;
+}
+
+.card-teste-aluno-rodape{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    font-size:12px;
+
+    color:#64748b;
+}
+
+.campo-lancamento-aluno{
+
+    position:relative;
+
+    margin:24px 0;
+}
+
+.input-gigante-wizard{
+
+    width:100%;
+
+    font-size:48px;
+
+    font-weight:800;
+
+    text-align:center;
+
+    padding:24px;
+
+    border-radius:20px;
+
+    border:3px solid var(--cor-primaria, #2563EB);
+}
+
+.input-gigante-wizard.campo-com-erro{
+
+    border-color:#DC2626;
+}
+
+.unidade-lancamento-aluno{
+
+    display:block;
+
+    text-align:center;
+
+    color:#64748b;
+
+    font-size:16px;
+
+    font-weight:700;
+
+    margin-top:8px;
+}
+
+.cartao-classificacao-aluno{
+
+    border:3px solid #94a3b8;
+
+    border-radius:20px;
+
+    padding:24px;
+
+    margin:20px 0;
+
+    transition:.2s;
+}
+
+.emoji-classificacao-aluno{
+
+    font-size:48px;
+}
+
+.texto-classificacao-aluno{
+
+    font-size:22px;
+
+    font-weight:800;
+
+    margin:6px 0;
+}
+
+.valor-resultado-aluno{
+
+    font-size:16px;
+
+    color:#475569;
+}
+
+.barra-evolucao-aluno{
+
+    margin:16px 0;
+}
+
+.barra-evolucao-aluno-item{
+
+    text-align:left;
+
+    font-size:13px;
+
+    color:#64748b;
+
+    margin-bottom:8px;
+}
+
+.barra-evolucao-trilha{
+
+    height:14px;
+
+    background:#E2E8F0;
+
+    border-radius:8px;
+
+    overflow:hidden;
+
+    margin-top:4px;
+}
+
+.barra-evolucao-trilha div{
+
+    height:100%;
+
+    background:var(--cor-primaria, #2563EB);
+
+    transition:width .4s;
+}
+
+.medalhas-aluno{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+
+    gap:12px;
+}
+
+.medalha-aluno{
+
+    text-align:center;
+
+    padding:16px;
+
+    background:#FEF9C3;
+
+    border-radius:14px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    color:#713F12;
+}
+
+.medalha-aluno.bloqueada{
+
+    background:#F1F5F9;
+
+    color:#94a3b8;
+
+    opacity:.6;
+}
+
+.medalha-aluno-emoji{
+
+    font-size:32px;
+
+    margin-bottom:6px;
+}
+
+@media (max-width:600px){
+
+    .etapa-aluno-conteudo{
+
+        padding:24px 18px;
+
+        border-radius:0;
+
+        box-shadow:none;
+
+        min-height:100vh;
+    }
+
+    .input-gigante-wizard{
+
+        font-size:36px;
+
+        padding:18px;
+    }
+
+}

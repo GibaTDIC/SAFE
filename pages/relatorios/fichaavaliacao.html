@@ -1,0 +1,77 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Ficha de Avaliação (para impressão)
+            </div>
+
+            <div class="page-subtitle">
+                Gera uma ficha em branco por aluno, com os dados já preenchidos e os testes em branco pra anotar no papel.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card no-print">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Escola</label>
+
+                <select id="escolaFicha" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Turma</label>
+
+                <select id="turmaFicha" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Aluno (opcional)</label>
+
+                <select id="alunoFicha" class="form-control">
+                    <option value="">Todos os alunos da turma</option>
+                </select>
+
+            </div>
+
+        </div>
+
+        <div class="toolbar" style="margin-top:10px;">
+
+            <div class="toolbar-left"></div>
+
+            <div class="toolbar-right">
+
+                <button id="btnGerarFichas" class="btn btn-primary">
+                    Gerar Fichas
+                </button>
+
+                <button id="btnExportarPdfFicha" class="btn btn-success" style="display:none">
+                    Exportar PDF
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="areaFichas"></div>
+
+</div>

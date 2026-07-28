@@ -1,0 +1,39 @@
+/* ==========================================================
+   SAFE - Sistema de Avaliação Física Escolar
+   Arquivo: forms.css
+   Versão: 2.0
+   Regras específicas de formulários. Componentes compartilhados
+   (.btn, .form-control, .form-group, .modal) ficam em global.css
+   — não redefinir aqui.
+========================================================== */
+
+/* ---------- Campo de pesquisa (input) das telas de listagem ---------- */
+
+.input-search{
+
+    flex:1;
+
+    padding:12px;
+
+    border-radius:8px;
+
+    border:1px solid #CFD8DC;
+
+}
+
+/* Container que envolve o campo de pesquisa + ações, quando usado
+   (antes chamado .search-box — renomeado pra não colidir com a
+   classe .search-box do global.css, que estiliza o input em si) */
+.busca-container{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:15px;
+
+    margin-bottom:25px;
+
+}

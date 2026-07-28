@@ -1,0 +1,233 @@
+/* ==========================================================
+   SAFE - Sistema de Avaliação Física Escolar
+   Arquivo: index.css
+========================================================== */
+
+body{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-height:100vh;
+
+    padding:20px;
+
+    background:linear-gradient(160deg, #EEF3F8 0%, #DCE8F7 100%);
+
+}
+
+.pagina-inicial{
+
+    width:100%;
+
+    max-width:560px;
+
+    text-align:center;
+
+}
+
+/* ===========================
+   MARCA GIBABIT (canto da página)
+=========================== */
+
+.marca-gibabit{
+
+    position:fixed;
+
+    top:20px;
+
+    right:24px;
+
+}
+
+.marca-gibabit img{
+
+    width:56px;
+
+    height:56px;
+
+    object-fit:contain;
+
+    opacity:.85;
+
+    transition:.25s;
+
+}
+
+.marca-gibabit img:hover{
+
+    opacity:1;
+
+    transform:scale(1.05);
+
+}
+
+/* ===========================
+   SELO PRÓPRIO DO SAFE
+=========================== */
+
+.logo-safe{
+
+    width:84px;
+
+    height:84px;
+
+    margin:0 auto 20px;
+
+    border-radius:22px;
+
+    background:linear-gradient(135deg, var(--cor-primaria, #1565C0), var(--cor-secundaria, #1976D2));
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    box-shadow:0 12px 28px rgba(21,101,192,.35);
+
+}
+
+.logo-safe i{
+
+    font-size:40px;
+
+    color:#FFF;
+
+}
+
+.pagina-inicial h1{
+
+    font-size:38px;
+
+    font-weight:800;
+
+    color:var(--cor-primaria, #1565C0);
+
+    letter-spacing:3px;
+
+}
+
+.pagina-inicial p{
+
+    color:#64748b;
+
+    margin-top:8px;
+
+    margin-bottom:36px;
+
+    font-size:15px;
+
+}
+
+.pagina-inicial .cards{
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:22px;
+
+}
+
+.pagina-inicial .card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:14px;
+
+    padding:40px 20px;
+
+    text-decoration:none;
+
+    color:var(--cor-texto, #263238);
+
+    font-weight:600;
+
+    font-size:15px;
+
+    border:1px solid rgba(21,101,192,.08);
+
+    transition:.25s;
+
+}
+
+.pagina-inicial .card i{
+
+    font-size:38px;
+
+    color:var(--cor-primaria, #1565C0);
+
+    transition:.25s;
+
+}
+
+.pagina-inicial .card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:0 16px 32px rgba(21,101,192,.18);
+
+    border-color:transparent;
+
+}
+
+.pagina-inicial .card:hover i{
+
+    color:var(--cor-secundaria, #1976D2);
+
+    transform:scale(1.08);
+
+}
+
+.pagina-inicial footer{
+
+    margin-top:40px;
+
+    font-size:13px;
+
+    color:#94a3b8;
+
+    background:none;
+
+    height:auto;
+
+    border-top:none;
+
+    box-shadow:none;
+
+}
+
+@media(max-width:520px){
+
+    .pagina-inicial .cards{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .marca-gibabit{
+
+        top:12px;
+
+        right:12px;
+
+    }
+
+    .marca-gibabit img{
+
+        width:40px;
+
+        height:40px;
+
+    }
+}

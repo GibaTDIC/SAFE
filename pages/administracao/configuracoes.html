@@ -1,0 +1,79 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Configurações
+            </div>
+
+            <div class="page-subtitle">
+                Parâmetros gerais do sistema SAFE.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Nome do sistema</label>
+
+                <input
+                    type="text"
+                    id="nomeSistemaConfig"
+                    class="form-control"
+                    maxlength="80"
+                    placeholder="SAFE - Sistema de Avaliação Física Escolar">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Ano letivo padrão</label>
+
+                <input
+                    type="number"
+                    id="anoLetivoConfig"
+                    class="form-control"
+                    min="2020"
+                    max="2100">
+
+                <small style="color:#94a3b8">
+                    Usado como valor sugerido ao cadastrar uma turma nova.
+                </small>
+
+            </div>
+
+        </div>
+
+        <div style="margin-top:20px;">
+
+            <button id="btnSalvarConfig" class="btn btn-primary">
+                Salvar
+            </button>
+
+        </div>
+
+    </div>
+
+    <p style="color:#94a3b8; font-size:13px; margin:-8px 0 20px;">
+        As configurações de acesso do aluno (livre ou com senha) agora ficam no
+        cadastro de cada <strong>Escola</strong> — cada uma pode ter sua própria regra.
+    </p>
+
+    <div id="loader" class="loader">
+
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <p>Salvando...</p>
+        </div>
+
+    </div>
+
+</div>

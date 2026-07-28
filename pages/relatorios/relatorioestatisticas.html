@@ -1,0 +1,132 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Relatório de Estatísticas
+            </div>
+
+            <div class="page-subtitle">
+                Distribuição das classificações de cada teste na escola.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card no-print">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Escola</label>
+
+                <select id="escolaRelEstat" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Turma</label>
+
+                <select id="turmaRelEstat" class="form-control">
+                    <option value="">Todas as turmas</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Sexo</label>
+
+                <select id="sexoRelEstat" class="form-control">
+                    <option value="">Ambos</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="Feminino">Feminino</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Aluno (opcional)</label>
+
+                <select id="alunoRelEstat" class="form-control">
+                    <option value="">Ver a turma toda (distribuição)</option>
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="areaRelatorioEstat" style="display:none">
+
+        <div class="card">
+
+            <div class="toolbar">
+
+                <div class="toolbar-left">
+                    <h3 id="tituloEstatRel" style="margin:0"></h3>
+                </div>
+
+                <div class="toolbar-right no-print">
+                    <button id="btnExportarPdfEstat" class="btn btn-primary">
+                        Exportar PDF
+                    </button>
+                </div>
+
+            </div>
+
+            <p style="color:#64748b; font-size:14px;">
+                Considera só o resultado mais recente de cada aluno em cada teste
+                (não conta a mesma pessoa duas vezes se ela fez o teste mais de uma vez).
+            </p>
+
+        </div>
+
+        <div id="secoesEstatisticas"></div>
+
+    </div>
+
+</div>
+
+<!-- POP-UP 1: ALUNOS DE UM NÍVEL -->
+<div id="modalAlunosNivel" class="modal modal-estatisticas">
+
+    <div class="modal-content" style="max-width:420px;">
+
+        <button class="fechar-modal-estatisticas" type="button" style="float:right; background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8;">&times;</button>
+
+        <h3 id="tituloModalAlunosNivel"></h3>
+
+        <p id="subtituloModalAlunosNivel" style="color:#64748b; font-size:13px;"></p>
+
+        <ul id="listaModalAlunosNivel" class="lista-alunos-nivel"></ul>
+
+    </div>
+
+</div>
+
+<!-- POP-UP 2: DETALHE DA AVALIAÇÃO DE UM ALUNO -->
+<div id="modalDetalheAvaliacao" class="modal modal-estatisticas">
+
+    <div class="modal-content" style="max-width:420px;">
+
+        <button class="fechar-modal-estatisticas" type="button" style="float:right; background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8;">&times;</button>
+
+        <h3 id="tituloModalDetalheAvaliacao"></h3>
+
+        <p id="subtituloModalDetalheAvaliacao" style="color:#64748b; font-size:13px;"></p>
+
+        <div id="corpoModalDetalheAvaliacao"></div>
+
+    </div>
+
+</div>

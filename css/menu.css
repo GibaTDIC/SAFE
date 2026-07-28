@@ -1,0 +1,439 @@
+/* ==========================================================
+   SAFE - Sistema de Avaliação Física Escolar
+   Arquivo: menu.css
+   Módulo: Layout
+   Versão: 1.0
+   Desenvolvido por: Raimundo CEMFOR + ChatGPT
+   (sem alterações — não tinha conflito com os outros arquivos)
+========================================================== */
+
+/* ===========================
+   MENU LATERAL
+=========================== */
+
+.sidebar{
+
+    width:270px;
+
+    background:linear-gradient(180deg,#0F172A,#1E293B);
+
+    color:#FFF;
+
+    display:flex;
+
+    flex-direction:column;
+
+    min-height:100vh;
+
+    box-shadow:4px 0 10px rgba(0,0,0,.12);
+
+    transition:transform .25s ease;
+
+}
+
+/* ===========================
+   MENU SANDUÍCHE (RESPONSIVO)
+=========================== */
+
+.btn-hamburguer{
+
+    display:none;
+
+    background:none;
+
+    border:none;
+
+    font-size:26px;
+
+    color:var(--cor-texto,#263238);
+
+    cursor:pointer;
+
+    padding:4px 10px;
+
+    margin-right:6px;
+
+}
+
+.overlay-menu{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(15,23,42,.5);
+
+    z-index:998;
+
+}
+
+@media(max-width:900px){
+
+    .btn-hamburguer{
+
+        display:block;
+
+    }
+
+    .sidebar{
+
+        position:fixed;
+
+        top:0;
+
+        left:0;
+
+        z-index:999;
+
+        transform:translateX(-100%);
+
+    }
+
+    .sidebar.aberto{
+
+        transform:translateX(0);
+
+    }
+
+    .overlay-menu.aberto{
+
+        display:block;
+
+    }
+
+    .container{
+
+        display:block;
+
+    }
+}
+
+/* ===========================
+   LOGO
+=========================== */
+
+.logo{
+
+    padding:30px 20px;
+
+    text-align:center;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.logo h2{
+
+    font-size:34px;
+
+    color:#FFFFFF;
+
+    letter-spacing:2px;
+
+}
+
+.logo span{
+
+    display:block;
+
+    margin-top:8px;
+
+    font-size:13px;
+
+    color:#CBD5E1;
+
+    line-height:18px;
+
+}
+
+/* ===========================
+   MENU
+=========================== */
+
+.sidebar nav{
+
+    flex:1;
+
+    margin-top:20px;
+
+}
+
+.sidebar ul{
+
+    list-style:none;
+
+}
+
+.sidebar li{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:16px 22px;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    font-size:16px;
+
+    border-left:5px solid transparent;
+
+}
+
+.sidebar li:hover{
+
+    background:rgba(255,255,255,.08);
+
+    border-left:5px solid #42A5F5;
+
+}
+
+.sidebar li.active{
+
+    background:var(--cor-primaria, #2563EB);
+
+    border-left:5px solid #FFFFFF;
+
+    font-weight:bold;
+
+}
+
+/* ===========================
+   BOTÃO SAIR
+=========================== */
+
+#logout{
+
+    margin-top:auto;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    color:#FFCDD2;
+
+}
+
+#logout:hover{
+
+    background:#C62828;
+
+    color:#FFF;
+
+}
+
+/* ===========================
+   ÍCONES
+=========================== */
+
+.sidebar li{
+
+    font-size:17px;
+
+}
+
+/* ===========================
+   BARRA DE ROLAGEM
+=========================== */
+
+.sidebar::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.sidebar::-webkit-scrollbar-thumb{
+
+    background:#455A64;
+
+    border-radius:20px;
+
+}
+
+/* ===========================
+   RESPONSIVO
+=========================== */
+
+@media(max-width:900px){
+
+    .sidebar{
+
+        position:fixed;
+
+        left:-270px;
+
+        top:0;
+
+        z-index:999;
+
+        transition:.3s;
+
+    }
+
+    .sidebar.show{
+
+        left:0;
+
+    }
+
+}
+
+/* ===========================
+   GRUPOS EXPANSÍVEIS
+=========================== */
+
+.menu-top{
+
+    list-style:none;
+
+}
+
+.menu-group{
+
+    border-bottom:1px solid rgba(255,255,255,.06);
+
+}
+
+.menu-group-header{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:14px 22px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#CBD5E1;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+    transition:.2s;
+
+    user-select:none;
+
+}
+
+.menu-group-header:hover{
+
+    background:rgba(255,255,255,.06);
+
+    color:#FFF;
+
+}
+
+.menu-group-header .chevron{
+
+    margin-left:auto;
+
+    font-size:12px;
+
+    transition:transform .2s;
+
+}
+
+.menu-group.open .menu-group-header .chevron{
+
+    transform:rotate(180deg);
+
+}
+
+.menu-group-items{
+
+    list-style:none;
+
+    max-height:0;
+
+    overflow:hidden;
+
+    transition:max-height .25s ease;
+
+}
+
+.menu-group.open .menu-group-items{
+
+    max-height:1500px;
+
+}
+
+.menu-group-items li{
+
+    padding-left:38px;
+
+    font-size:15px;
+
+}
+
+/* ===========================
+   ITENS "EM BREVE"
+=========================== */
+
+.sidebar li.disabled{
+
+    cursor:not-allowed;
+
+    opacity:.5;
+
+}
+
+.sidebar li.disabled:hover{
+
+    background:transparent;
+
+    border-left:5px solid transparent;
+
+}
+
+.badge-em-breve{
+
+    margin-left:auto;
+
+    font-size:10px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.5px;
+
+    background:rgba(255,255,255,.12);
+
+    padding:3px 8px;
+
+    border-radius:10px;
+
+    white-space:nowrap;
+
+}
+
+.menu-bottom{
+
+    margin-top:auto;
+
+}
+
+.menu-bottom #logout{
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    color:#FFCDD2;
+
+}
+
+.menu-bottom #logout:hover{
+
+    background:#C62828;
+
+    color:#FFF;
+
+}

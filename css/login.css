@@ -1,0 +1,89 @@
+/* ==========================================================
+   SAFE - Sistema de Avaliação Física Escolar
+   Arquivo: login.css
+   Depende de global.css (variáveis de cor, inputs, botão)
+   sendo carregado ANTES ou DEPOIS não importa aqui, pois
+   este arquivo só usa var(--...) e não redefine inputs/botão.
+========================================================== */
+
+body{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    min-height:100vh;
+
+    background:var(--cor-fundo, #EEF3F8);
+
+}
+
+.login-box{
+
+    width:100%;
+
+    max-width:360px;
+
+    background:var(--cor-card, #FFFFFF);
+
+    border-radius:var(--radius, 12px);
+
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+
+    padding:40px 32px;
+
+    box-sizing:border-box;
+
+}
+
+.login-box h2{
+
+    text-align:center;
+
+    color:var(--cor-primaria, #1565C0);
+
+    margin-bottom:28px;
+
+    font-size:22px;
+
+}
+
+.login-box input{
+
+    margin-bottom:16px;
+
+}
+
+.login-box button{
+
+    width:100%;
+
+    margin-top:8px;
+
+}
+
+.link-voltar{
+
+    display:block;
+
+    text-align:center;
+
+    margin-top:20px;
+
+    font-size:14px;
+
+    color:#64748b;
+
+    text-decoration:none;
+
+}
+
+.link-voltar:hover{
+
+    color:var(--cor-primaria, #1565C0);
+
+    text-decoration:underline;
+
+}

@@ -1,0 +1,398 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Cadastro de Alunos
+            </div>
+
+            <div class="page-subtitle">
+                Gerenciamento dos alunos cadastrados no SAFE.
+            </div>
+
+        </div>
+
+    </div>
+<!-- =====================================================
+     MODAL CADASTRO DE ALUNO
+====================================================== -->
+
+<div id="modalAluno" class="modal">
+
+    <div class="modal-content">
+
+        <h2 id="tituloModalAluno">
+
+            Cadastro de Aluno
+
+        </h2>
+
+        <form id="formAluno">
+
+            <div class="form-grid">
+
+                <div class="form-group">
+
+                    <label for="nomeAluno">
+
+                        Nome Completo
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nomeAluno"
+                        class="form-control"
+                        maxlength="120"
+                        required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="matriculaAluno">
+
+                        Matrícula
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="matriculaAluno"
+                        class="form-control"
+                        maxlength="30">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="sexoAluno">
+
+                        Sexo
+
+                    </label>
+
+                    <select
+                        id="sexoAluno"
+                        class="form-control">
+
+                        <option value="">
+
+                            Selecione
+
+                        </option>
+
+                        <option value="Masculino">
+
+                            Masculino
+
+                        </option>
+
+                        <option value="Feminino">
+
+                            Feminino
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="dataNascimento">
+
+                        Data de Nascimento
+
+                    </label>
+
+                    <input
+                        type="date"
+                        id="dataNascimento"
+                        class="form-control">
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="escolaAluno">
+
+                        Escola
+
+                    </label>
+
+                    <select
+                        id="escolaAluno"
+                        class="form-control">
+
+                        <option value="">
+
+                            Carregando...
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="turmaAluno">
+
+                        Turma
+
+                    </label>
+
+                    <select
+                        id="turmaAluno"
+                        class="form-control">
+
+                        <option value="">
+
+                            Carregando...
+
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+            <div class="acoes-modal">
+
+                <button
+                    type="button"
+                    id="btnCancelarAluno"
+                    class="btn btn-secondary">
+
+                    Cancelar
+
+                </button>
+
+                <button
+                    type="submit"
+                    id="btnSalvarAluno"
+                    class="btn btn-primary">
+
+                    Salvar
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+<!-- =====================================================
+     TOAST
+====================================================== -->
+
+<div id="toast" class="toast"></div>
+
+<!-- =====================================================
+     LOADER
+====================================================== -->
+
+<div id="loader" class="loader">
+
+    <div class="loader-box">
+
+        <div class="spinner"></div>
+
+        <p>Salvando informações...</p>
+
+    </div>
+
+</div>
+    <div class="card">
+
+        <div class="toolbar">
+
+            <div class="toolbar-left">
+
+                <input
+                    type="text"
+                    id="pesquisaAluno"
+                    class="form-control search-box"
+                    placeholder="Pesquisar aluno...">
+
+                <select id="filtroTurmaAluno" class="form-control" style="max-width:220px">
+
+                    <option value="">Todas as turmas</option>
+
+                </select>
+
+            </div>
+
+            <div class="toolbar-right">
+
+                <select id="escolaDestinoImportacao" class="form-control" style="max-width:220px; display:none;">
+                    <option value="">Escola de destino...</option>
+                </select>
+
+                <button
+                    id="btnImportarExcel"
+                    class="btn btn-success">
+
+                    Importar Excel
+
+                </button>
+
+                <input  
+                  type="file" 
+                  id="arquivoExcel"
+                  accept=".xlsx,.xls"
+                  style="display:none">
+
+                <button
+                    id="btnImportarPDF"
+                    class="btn btn-secondary">
+
+                    Importar PDF
+
+                </button>
+
+                <button
+                    id="btnNovoAluno"
+                    class="btn btn-primary">
+
+                    Novo Aluno
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Nome</th>
+
+                    <th>Matrícula</th>
+
+                    <th>Idade</th>
+
+                    <th>Sexo</th>
+
+                    <th>Turma</th>
+
+                    <th>Ações</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="listaAlunos">
+
+            </tbody>
+
+        </table>
+
+        <div class="paginacao">
+
+            <button
+                id="paginaAnterior"
+                class="btn-secondary">
+
+                ◄ Anterior
+
+            </button>
+
+            <span id="infoPagina">
+
+                Página 1 de 1
+
+            </span>
+
+            <button
+                id="paginaProxima"
+                class="btn-secondary">
+
+                Próxima ►
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL DE CONFERÊNCIA DA IMPORTAÇÃO -->
+<div id="modalConferenciaImportacao" class="modal">
+
+    <div class="modal-content" style="max-width:900px;">
+
+        <h3>Conferência da Importação</h3>
+
+        <p id="resumoConferenciaImportacao" style="color:#64748b"></p>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label for="escolaConferenciaImportacao">Escola de destino</label>
+
+                <select id="escolaConferenciaImportacao" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="turmaConferenciaImportacao">Turma (opcional)</label>
+
+                <select id="turmaConferenciaImportacao" class="form-control">
+                    <option value="">Manter a turma de cada linha da planilha</option>
+                </select>
+
+                <small style="color:#94a3b8">Só preencha se quiser forçar TODOS os alunos abaixo pra uma turma só.</small>
+
+            </div>
+
+        </div>
+
+        <div style="max-height:400px; overflow-y:auto; margin-top:15px; border:1px solid var(--borda); border-radius:8px;">
+
+            <table class="table">
+
+                <thead style="position:sticky; top:0; background:#FFF;">
+
+                    <tr>
+                        <th><input type="checkbox" id="marcarTodosConferencia" checked></th>
+                        <th>Linha</th>
+                        <th>Nome</th>
+                        <th>Turma</th>
+                        <th>Data Nasc.</th>
+                        <th>Situação</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="corpoConferenciaImportacao"></tbody>
+
+            </table>
+
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:10px; justify-content:flex-end;">
+
+            <button id="cancelarConferenciaImportacao" class="btn-secondary">Cancelar</button>
+
+            <button id="confirmarConferenciaImportacao" class="btn btn-primary">Confirmar Importação</button>
+
+        </div>
+
+    </div>
+
+</div>

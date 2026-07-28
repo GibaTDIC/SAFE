@@ -1,0 +1,232 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Escolas
+            </div>
+
+            <div class="page-subtitle">
+                Cadastro das escolas atendidas pelo SAFE.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="toolbar">
+
+        <div class="toolbar-left">
+
+            <input
+                type="text"
+                id="pesquisaEscola"
+                class="form-control search-box"
+                placeholder="Pesquisar escola...">
+
+        </div>
+
+        <div class="toolbar-right">
+
+            <button
+                id="btnNovaEscola"
+                class="btn btn-primary">
+
+                Nova Escola
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Nome</th>
+
+                    <th>Endereço</th>
+
+                    <th>Telefone</th>
+
+                    <th>Status</th>
+
+                    <th>Ações</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="listaEscolas">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     MODAL CADASTRO DE ESCOLA
+====================================================== -->
+
+<div id="modalEscola" class="modal">
+
+    <div class="modal-content">
+
+        <h2 id="tituloModalEscola">
+
+            Nova Escola
+
+        </h2>
+
+        <input type="hidden" id="escolaId">
+
+        <div class="form-group">
+
+            <label for="nomeEscola">Nome</label>
+
+            <input
+                type="text"
+                id="nomeEscola"
+                class="form-control"
+                maxlength="120">
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="enderecoEscola">Endereço</label>
+
+            <input
+                type="text"
+                id="enderecoEscola"
+                class="form-control"
+                maxlength="200">
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="telefoneEscola">Telefone</label>
+
+            <input
+                type="text"
+                id="telefoneEscola"
+                class="form-control"
+                maxlength="20">
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="ativoEscola">Status</label>
+
+            <select id="ativoEscola" class="form-control">
+
+                <option value="true">Ativa</option>
+
+                <option value="false">Inativa</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="modoAcessoAlunoEscola">Portal do Aluno — Modo de acesso</label>
+
+            <select id="modoAcessoAlunoEscola" class="form-control">
+
+                <option value="livre">Acesso livre (nunca pede senha)</option>
+
+                <option value="senhaNascimento">Exigir senha (data de nascimento) — com exceções abaixo</option>
+
+            </select>
+
+            <small style="color:#94a3b8">
+                Com senha, o aluno precisa confirmar a própria data de nascimento
+                antes de registrar um teste — ajuda a evitar que um aluno mexa no
+                perfil do outro (não é uma senha criptografada de verdade).
+            </small>
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="idadeMinimaSenhaEscola">Idade mínima pra exigir senha</label>
+
+            <input type="number" id="idadeMinimaSenhaEscola" class="form-control" min="0" max="99">
+
+            <small style="color:#94a3b8">
+                Alunos mais novos que essa idade não precisam de senha, mesmo com
+                o modo acima ativo (a não ser que a turma exija — configurável em Turmas).
+            </small>
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="tentativasMaximasEscola">Tentativas máximas antes de bloquear</label>
+
+            <input type="number" id="tentativasMaximasEscola" class="form-control" min="1" max="20">
+
+        </div>
+
+        <div class="form-group">
+
+            <label for="tempoBloqueioMinutosEscola">Tempo de bloqueio (minutos)</label>
+
+            <input type="number" id="tempoBloqueioMinutosEscola" class="form-control" min="1" max="60">
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                type="button"
+                id="cancelarEscola"
+                class="btn btn-secondary">
+
+                Cancelar
+
+            </button>
+
+            <button
+                type="button"
+                id="salvarEscola"
+                class="btn btn-success">
+
+                Salvar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     LOADER
+====================================================== -->
+
+<div id="loader" class="loader">
+
+    <div class="loader-box">
+
+        <div class="spinner"></div>
+
+        <p>Salvando informações...</p>
+
+    </div>
+
+</div>

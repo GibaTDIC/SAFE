@@ -1,0 +1,54 @@
+/* ==========================================================
+   SAFE - Sistema de Avaliação Física Escolar
+   Arquivo: tables.css
+   Versão: 2.0
+   Skin específico do .safe-table (usado em Turmas). Os botões
+   de ação (.table-actions, .btn-icon, .btn-edit, .btn-delete)
+   ficam em global.css, compartilhados com o .table padrão.
+========================================================== */
+
+.safe-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:#FFF;
+
+    border-radius:10px;
+
+    overflow:hidden;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.08);
+
+}
+
+.safe-table thead{
+
+    background:var(--cor-primaria);
+
+    color:#FFF;
+
+}
+
+.safe-table th{
+
+    padding:14px;
+
+    text-align:left;
+
+}
+
+.safe-table td{
+
+    padding:13px;
+
+    border-bottom:1px solid #ECEFF1;
+
+}
+
+.safe-table tbody tr:hover{
+
+    background:#F5F7FA;
+
+}

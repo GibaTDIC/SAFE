@@ -1,0 +1,297 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+
+                Gestão de Turmas
+
+            </div>
+
+            <div class="page-subtitle">
+
+                Cadastro e gerenciamento das turmas.
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="toolbar">
+
+    <button
+        id="btnNovaTurma"
+        class="btn btn-primary">
+
+        Nova Turma
+
+    </button>
+
+</div>
+
+    <div class="card">
+    <input
+        type="text"
+        id="pesquisaTurma"
+        class="input-search"
+        placeholder="Pesquisar turma...">
+
+</div>
+
+<table class="safe-table">
+
+    <thead>
+
+        <th onclick="ordenarTabela('nome')" class="sortable">
+
+    Turma
+
+</th>
+
+<th onclick="ordenarTabela('serie')" class="sortable">
+
+    Série
+
+</th>
+
+<th onclick="ordenarTabela('turno')" class="sortable">
+
+    Turno
+
+</th>
+
+<th onclick="ordenarTabela('anoLetivo')" class="sortable">
+
+    Ano
+
+</th>
+
+<th>
+
+    Alunos
+
+</th>
+
+<th>
+
+    Ações
+
+</th>
+
+    </thead>
+
+    <tbody id="listaTurmas">
+
+        <tr>
+
+            <td colspan="6" style="text-align:center">
+
+                Nenhuma turma cadastrada.
+
+            </td>
+
+        </tr>
+
+    </tbody>
+
+</table>
+
+<!-- ==========================================
+     PAGINAÇÃO
+========================================== -->
+
+<div class="paginacao">
+
+    <button id="paginaAnterior" class="btn-secundario">
+
+        ◄ Anterior
+
+    </button>
+
+    <span id="infoPagina">
+
+        Página 1 de 1
+
+    </span>
+
+    <button id="paginaProxima" class="btn-secundario">
+
+        Próxima ►
+
+    </button>
+
+</div>
+
+<!-- MODAL -->
+
+<div class="modal" id="modalTurma">
+
+    <div class="modal-content">
+
+        <h2>Nova Turma</h2>
+        <input type="hidden" id="turmaId">
+
+        <br>
+
+        <div class="form-group" id="grupoEscolaTurma" style="display:none">
+
+            <label>Escola</label>
+
+            <select
+                id="escolaTurma"
+                class="form-control">
+
+                <option value="">Selecione...</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Nome da Turma</label>
+
+            <input
+                id="nomeTurma"
+                class="form-control">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Série</label>
+
+            <input
+                id="serieTurma"
+                class="form-control">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Turno</label>
+
+            <select
+                id="turnoTurma"
+                class="form-control">
+
+                <option>Manhã</option>
+
+                <option>Tarde</option>
+
+                <option>Noite</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Ano Letivo</label>
+
+            <input
+                id="anoTurma"
+                class="form-control"
+                type="number"
+                value="2026">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Autenticação obrigatória (portal do aluno)</label>
+
+            <select id="exigirSenhaTurma" class="form-control">
+                <option value="false">Não</option>
+                <option value="true">Sim</option>
+            </select>
+
+            <small style="color:#94a3b8">
+                Se "Sim", alunos dessa turma sempre precisam confirmar a data de
+                nascimento antes de fazer um teste, independente da idade.
+            </small>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                class="btn btn-secondary"
+                id="cancelarTurma">
+
+                Cancelar
+
+            </button>
+
+            <button
+                class="btn btn-success"
+                id="salvarTurma">
+
+                Salvar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- =============================================
+TOAST
+============================================= -->
+
+<div id="toast" class="toast"></div>
+
+<!-- =============================================
+LOADER
+============================================= -->
+
+<div id="loader" class="loader">
+
+    <div class="loader-box">
+
+        <div class="spinner"></div>
+
+        <p>Salvando informações...</p>
+
+    </div>
+
+</div>
+
+<!-- =============================================
+MODAL DE CONFIRMAÇÃO
+============================================= -->
+
+<div id="modalConfirmacao" class="modal">
+
+    <div class="modal-content">
+
+        <h3>Confirmação</h3>
+
+        <p id="textoConfirmacao"></p>
+
+        <div class="acoes-modal">
+
+    <button
+        id="btnCancelarConfirmacao"
+        class="btn btn-secondary">
+
+        Cancelar
+
+    </button>
+
+    <button
+        id="btnConfirmarExclusao"
+        class="btn btn-danger">
+
+        Excluir
+
+    </button>
+
+</div>
+
+    </div>
+
+</div>

@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SAFE - Sistema de Avaliação Física Escolar</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/menu.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+
+<link rel="stylesheet" href="css/forms.css">
+<link rel="stylesheet" href="css/tables.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div id="overlayMenu" class="overlay-menu"></div>
+
+        <!-- MENU -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+
+                <h2>SAFE</h2>
+
+                <span>Sistema de Avaliação Física Escolar</span>
+
+            </div>
+
+            <nav>
+
+    <ul class="menu-top">
+
+        <li data-page="dashboard" class="active">
+            <i class="bi bi-speedometer2"></i>
+            Dashboard
+        </li>
+
+    </ul>
+
+    <div class="menu-group" data-grupo="cadastros">
+
+        <div class="menu-group-header">
+            <i class="bi bi-folder"></i>
+            Cadastros
+            <i class="bi bi-chevron-down chevron"></i>
+        </div>
+
+        <ul class="menu-group-items">
+
+            <li data-page="turmas">
+                <i class="bi bi-building"></i>
+                Turmas
+            </li>
+
+            <li data-page="alunos">
+                <i class="bi bi-people-fill"></i>
+                Alunos
+            </li>
+
+            <li data-page="professores">
+                <i class="bi bi-person-badge"></i>
+                Professores
+            </li>
+
+            <li data-page="escolas">
+                <i class="bi bi-building-fill-gear"></i>
+                Escolas
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="menu-group" data-grupo="avaliacoes">
+
+        <div class="menu-group-header">
+            <i class="bi bi-clipboard2-pulse"></i>
+            Avaliações Físicas
+            <i class="bi bi-chevron-down chevron"></i>
+        </div>
+
+        <ul class="menu-group-items">
+
+            <li data-page="leger">
+                <i class="bi bi-stopwatch"></i>
+                Léger
+            </li>
+
+            <li data-page="circunferenciacintura">
+                <i class="bi bi-rulers"></i>
+                Perímetro da Cintura
+            </li>
+
+            <li data-page="imc">
+                <i class="bi bi-heart-pulse"></i>
+                IMC
+            </li>
+
+            <li data-page="flexibilidade">
+                <i class="bi bi-arrows-angle-expand"></i>
+                Flexibilidade (Sentar e Alcançar)
+            </li>
+
+            <li data-page="abdominal">
+                <i class="bi bi-lightning"></i>
+                Resistência Muscular Localizada (Abdominal)
+            </li>
+
+            <li data-page="medicineball">
+                <i class="bi bi-arm-flex"></i>
+                Potência de Membros Superiores (Medicine Ball)
+            </li>
+
+            <li data-page="saltohorizontal">
+                <i class="bi bi-rulers"></i>
+                Potência de Membros Inferiores (Salto Horizontal)
+            </li>
+
+            <li data-page="agilidade">
+                <i class="bi bi-shuffle"></i>
+                Agilidade (Quadrado 4x4m)
+            </li>
+
+            <li data-page="corrida20m">
+                <i class="bi bi-lightning-charge"></i>
+                Velocidade (Corrida 20m)
+            </li>
+
+            <li data-page="corrida6min">
+                <i class="bi bi-activity"></i>
+                Aptidão Cardiorrespiratória (6min)
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="menu-group" data-grupo="relatorios">
+
+        <div class="menu-group-header">
+            <i class="bi bi-bar-chart-line"></i>
+            Relatórios
+            <i class="bi bi-chevron-down chevron"></i>
+        </div>
+
+        <ul class="menu-group-items">
+
+            <li data-page="relatorioIndividual">
+                <i class="bi bi-person-lines-fill"></i>
+                Individuais
+            </li>
+
+            <li data-page="relatorioTurma">
+                <i class="bi bi-people"></i>
+                Turmas
+            </li>
+
+            <li data-page="relatorioEscola">
+                <i class="bi bi-building"></i>
+                Escola
+            </li>
+
+            <li data-page="relatorioEstatisticas">
+                <i class="bi bi-graph-up"></i>
+                Estatísticas
+            </li>
+
+            <li data-page="fichaAvaliacao">
+                <i class="bi bi-file-earmark-text"></i>
+                Ficha de Avaliação
+            </li>
+
+            <li data-page="relatorioCientifico">
+                <i class="bi bi-file-earmark-medical"></i>
+                Relatório Científico
+            </li>
+
+        </ul>
+
+    </div>
+
+    <div class="menu-group" data-grupo="administracao">
+
+        <div class="menu-group-header">
+            <i class="bi bi-gear-fill"></i>
+            Administração
+            <i class="bi bi-chevron-down chevron"></i>
+        </div>
+
+        <ul class="menu-group-items">
+
+            <li data-page="repararDados">
+                <i class="bi bi-tools"></i>
+                Reparo de Dados
+            </li>
+
+            <li data-page="configuracoes">
+                <i class="bi bi-sliders"></i>
+                Configurações
+            </li>
+
+            <li data-page="backup">
+                <i class="bi bi-cloud-arrow-down"></i>
+                Backup
+            </li>
+
+        </ul>
+
+    </div>
+
+    <ul class="menu-top menu-bottom">
+
+        <li id="logout">
+            <i class="bi bi-box-arrow-right"></i>
+            Sair
+        </li>
+
+    </ul>
+
+</nav>
+        </aside>
+
+        <!-- ÁREA PRINCIPAL -->
+
+        <div class="main">
+
+            <!-- TOPO -->
+
+            <header class="topbar">
+
+                <button id="btnMenuHamburguer" class="btn-hamburguer" aria-label="Abrir menu">
+                    <i class="bi bi-list"></i>
+                </button>
+
+                <div>
+
+                    <h1>
+
+                        Sistema de Avaliação Física Escolar
+
+                    </h1>
+
+                </div>
+
+                <div class="area-usuario">
+
+                    <div class="usuario" id="usuarioLogado">
+
+                        Carregando...
+
+                    </div>
+
+                    <div id="seletorEscolaContainer"></div>
+
+                </div>
+
+                
+
+            </header>
+
+            <div id="bannerSomenteLeitura" style="display:none; background:#FEF3C7; color:#92400E; padding:10px 20px; font-size:14px; font-weight:600; text-align:center;">
+                <i class="bi bi-eye"></i>
+                Modo somente leitura — você pode visualizar tudo, mas não pode criar, editar ou excluir nada. Fale com o coordenador da escola se isso não deveria estar assim.
+            </div>
+
+            <!-- ÁREA DOS MÓDULOS -->
+
+            <div id="content">
+
+                <!-- dashboard será carregado aqui -->
+
+            </div>
+
+            <!-- RODAPÉ -->
+
+            <footer>
+
+                SAFE © 2026
+
+            </footer>
+
+        </div>
+
+    </div>
+
+    <script type="module" src="js/core/app.js"></script>
+
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+
+</body>
+
+</html>

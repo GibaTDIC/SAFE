@@ -1,0 +1,137 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Dashboard Individual
+            </div>
+
+            <div class="page-subtitle">
+                SAFE Score, evolução e recomendação primeiro — histórico completo por baixo.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card no-print">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Escola</label>
+
+                <select id="escolaRel" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Turma</label>
+
+                <select id="turmaRel" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Aluno</label>
+
+                <select id="alunoRel" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="areaRelatorio" style="display:none">
+
+        <div class="card">
+
+            <div class="toolbar">
+
+                <div class="toolbar-left">
+
+                    <h3 style="margin:0">Dados do Aluno</h3>
+
+                </div>
+
+                <div class="toolbar-right no-print">
+
+                    <button id="btnExportarPdf" class="btn btn-primary">
+                        Exportar PDF
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>SAFE-ID</label>
+                    <input id="codigoAlunoRel" class="form-control" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input id="nomeAlunoRel" class="form-control" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Sexo</label>
+                    <input id="sexoAlunoRel" class="form-control" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Idade</label>
+                    <input id="idadeAlunoRel" class="form-control" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Escola</label>
+                    <input id="escolaAlunoRel" class="form-control" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Turma</label>
+                    <input id="turmaAlunoRel" class="form-control" readonly>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="resumoIndividual"></div>
+
+        <div class="card no-print">
+
+            <button id="btnToggleHistoricoIndividual" class="btn-secondary">
+                Ver histórico completo das avaliações ▾
+            </button>
+
+        </div>
+
+        <div id="areaHistoricoIndividual" style="display:none">
+
+            <div id="secoesTestes">
+
+                <!-- uma seção por teste é montada aqui via JS -->
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

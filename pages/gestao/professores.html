@@ -1,0 +1,210 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Professores
+            </div>
+
+            <div class="page-subtitle">
+                Cadastro de professores e administradores de escola.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="toolbar">
+
+        <div class="toolbar-left">
+
+            <input
+                type="text"
+                id="pesquisaProfessor"
+                class="form-control search-box"
+                placeholder="Pesquisar por nome ou e-mail...">
+
+        </div>
+
+        <div class="toolbar-right">
+
+            <button
+                id="btnNovoProfessor"
+                class="btn btn-primary">
+
+                Novo Professor
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Nome</th>
+
+                    <th>E-mail</th>
+
+                    <th>Papel</th>
+
+                    <th>Escola</th>
+
+                    <th>Status</th>
+
+                    <th>Ações</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="listaProfessores">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     MODAL CADASTRO
+====================================================== -->
+
+<div id="modalProfessor" class="modal">
+
+    <div class="modal-content">
+
+        <h2 id="tituloModalProfessor">
+
+            Novo Professor
+
+        </h2>
+
+        <input type="hidden" id="professorUid">
+
+        <div class="form-group">
+
+            <label for="nomeProfessor">Nome</label>
+
+            <input
+                type="text"
+                id="nomeProfessor"
+                class="form-control"
+                maxlength="120">
+
+        </div>
+
+        <div class="form-group" id="grupoEmail">
+
+            <label for="emailProfessor">E-mail</label>
+
+            <input
+                type="email"
+                id="emailProfessor"
+                class="form-control">
+
+        </div>
+
+        <div class="form-group" id="grupoSenha">
+
+            <label for="senhaProfessor">Senha inicial</label>
+
+            <input
+                type="text"
+                id="senhaProfessor"
+                class="form-control"
+                placeholder="Mínimo 6 caracteres">
+
+        </div>
+
+        <div class="form-group" id="grupoPapel">
+
+            <label for="papelProfessor">Papel</label>
+
+            <select id="papelProfessor" class="form-control">
+
+                <option value="professor">Professor</option>
+
+                <option value="admin_escola">Admin da Escola</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group" id="grupoEscola">
+
+            <label>Escola(s)</label>
+
+            <div id="listaEscolasProfessor" style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto; border:1px solid var(--borda); border-radius:8px; padding:10px;">
+                <!-- checkboxes montados via JS -->
+            </div>
+
+            <small style="color:#94a3b8">Marque uma ou mais escolas que esse professor atende.</small>
+
+        </div>
+
+        <div class="form-group" id="grupoAtivo">
+
+            <label for="ativoProfessor">Status</label>
+
+            <select id="ativoProfessor" class="form-control">
+
+                <option value="true">Ativo</option>
+
+                <option value="false">Inativo</option>
+
+            </select>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                type="button"
+                id="cancelarProfessor"
+                class="btn btn-secondary">
+
+                Cancelar
+
+            </button>
+
+            <button
+                type="button"
+                id="salvarProfessor"
+                class="btn btn-success">
+
+                Salvar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =====================================================
+     LOADER
+====================================================== -->
+
+<div id="loader" class="loader">
+
+    <div class="loader-box">
+
+        <div class="spinner"></div>
+
+        <p>Salvando informações...</p>
+
+    </div>
+
+</div>

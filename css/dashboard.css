@@ -1,0 +1,29 @@
+/* ==========================================================
+   SAFE - Sistema de Avaliação Física Escolar
+   Arquivo: dashboard.css
+   Versão: 2.0
+   Regras específicas do Dashboard. Componentes compartilhados
+   (card, cards, botões, modal, toast, tabela, paginação) ficam
+   em global.css — não redefinir aqui.
+========================================================== */
+
+.graficos{
+
+    padding:20px;
+
+    background:#FFF;
+
+    margin:20px 0;
+
+    border-radius:var(--radius);
+
+}
+
+#ultimasAtividades,
+#agenda{
+
+    color:#64748b;
+
+    padding:10px 0;
+
+}

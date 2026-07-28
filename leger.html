@@ -1,0 +1,318 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title"><span id="iconeTesteContainer"></span>
+
+                Teste de Léger
+
+            </div>
+
+            <div class="page-subtitle">
+
+                Avaliação da capacidade cardiorrespiratória.
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>
+
+                    Turma
+
+                </label>
+
+                <select
+                    id="turmaLeger"
+                    class="form-control">
+
+                    <option value="">
+
+                        Selecione...
+
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+
+                    Aluno
+
+                </label>
+
+                <select
+                    id="alunoLeger"
+                    class="form-control">
+
+                    <option value="">
+
+                        Selecione...
+
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>
+
+            Dados do aluno
+
+        </h3>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>SAFE-ID</label>
+
+                <input
+                    id="codigoAluno"
+                    class="form-control"
+                    readonly>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Nome</label>
+
+                <input
+                    id="nomeAluno"
+                    class="form-control"
+                    readonly>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Sexo</label>
+
+                <input
+                    id="sexoAluno"
+                    class="form-control"
+                    readonly>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Idade</label>
+
+                <input
+                    id="idadeAluno"
+                    class="form-control"
+                    readonly>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Escola</label>
+
+                <input
+                    id="escolaAluno"
+                    class="form-control"
+                    readonly>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>
+
+            Resultado do Teste
+
+        </h3>
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>
+
+                    Total de voltas concluídas
+
+                </label>
+
+                <input
+                    id="voltasTotais"
+                    type="number"
+                    min="0"
+                    class="form-control"
+                    placeholder="Ex: 45">
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+
+                    Estágio alcançado (calculado)
+
+                </label>
+
+                <input
+                    id="estagioCalculado"
+                    type="text"
+                    class="form-control"
+                    readonly>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+
+                    Esforço percebido
+
+                </label>
+
+                <select
+                    id="esforco"
+                    class="form-control">
+
+                    <option value="">
+
+                        Selecione
+
+                    </option>
+
+                    <option>Muito leve</option>
+
+                    <option>Leve</option>
+
+                    <option>Moderado</option>
+
+                    <option>Intenso</option>
+
+                    <option>Máximo</option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+
+                    Sensação
+
+                </label>
+
+                <select
+                    id="sensacao"
+                    class="form-control">
+
+                    <option value="">
+
+                        Selecione
+
+                    </option>
+
+                    <option>Cansaço nas pernas</option>
+
+                    <option>Respiração acelerada</option>
+
+                    <option>Coração acelerado</option>
+
+                    <option>Falta de ar</option>
+
+                    <option>Outro</option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>
+
+                    Observações
+
+                </label>
+
+                <textarea
+                    id="observacoes"
+                    class="form-control"
+                    rows="4"></textarea>
+
+            </div>
+
+        </div>
+
+        <div style="margin-top:25px;">
+
+            <button
+                id="btnSalvarLeger"
+                class="btn btn-primary">
+
+                Salvar Avaliação
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="card">
+
+        <h3>
+
+            Histórico do Aluno
+
+        </h3>
+
+        <table class="table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Data</th>
+
+                    <th>Estágio</th>
+
+                    <th>Volta</th>
+
+                    <th>VO₂máx</th>
+
+                    <th>Classificação</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="historicoLeger">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

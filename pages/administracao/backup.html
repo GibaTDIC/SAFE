@@ -1,0 +1,124 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Backup
+            </div>
+
+            <div class="page-subtitle">
+                Exporta todos os dados de uma escola em PDF.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card no-print">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Escola</label>
+
+                <select id="escolaBackup" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+        </div>
+
+        <p style="color:#64748b; font-size:14px; margin-top:10px;">
+            Isso pode levar alguns segundos, dependendo de quantos alunos e
+            avaliações a escola tiver.
+        </p>
+
+    </div>
+
+    <div id="areaBackup" style="display:none">
+
+        <div class="card">
+
+            <div class="toolbar">
+
+                <div class="toolbar-left">
+                    <h3 id="tituloBackup" style="margin:0"></h3>
+                </div>
+
+                <div class="toolbar-right no-print">
+                    <button id="btnExportarPdfBackup" class="btn btn-primary">
+                        Exportar PDF
+                    </button>
+                </div>
+
+            </div>
+
+            <p style="color:#64748b; font-size:13px;">
+                Gerado em <span id="dataGeracaoBackup"></span>
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Turmas</h3>
+
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Série</th>
+                        <th>Turno</th>
+                        <th>Ano Letivo</th>
+                        <th>Nº Alunos</th>
+                    </tr>
+                </thead>
+
+                <tbody id="corpoTurmasBackup"></tbody>
+
+            </table>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Alunos</h3>
+
+            <table class="table">
+
+                <thead>
+                    <tr>
+                        <th>SAFE-ID</th>
+                        <th>Nome</th>
+                        <th>Matrícula</th>
+                        <th>Sexo</th>
+                        <th>Data Nasc.</th>
+                        <th>Turma</th>
+                    </tr>
+                </thead>
+
+                <tbody id="corpoAlunosBackup"></tbody>
+
+            </table>
+
+        </div>
+
+        <div id="secoesTestesBackup"></div>
+
+    </div>
+
+    <div id="loader" class="loader">
+
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <p>Gerando backup...</p>
+        </div>
+
+    </div>
+
+</div>

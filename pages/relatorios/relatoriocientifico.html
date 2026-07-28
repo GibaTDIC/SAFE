@@ -1,0 +1,160 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Relatório Científico
+            </div>
+
+            <div class="page-subtitle">
+                Estatística descritiva pronta pra pesquisa — layout sóbrio, otimizado pra impressão em PDF.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card no-print">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Escola</label>
+
+                <select id="escolaRelCientifico" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Turma (opcional)</label>
+
+                <select id="turmaRelCientifico" class="form-control">
+                    <option value="">Todas as turmas</option>
+                </select>
+
+            </div>
+
+        </div>
+
+        <p style="color:#94a3b8; font-size:13px; margin-top:6px;">
+
+            Este relatório traz estatística descritiva (médias, desvio padrão, quartis,
+            etc). Testes de hipótese (ANOVA, qui-quadrado, regressão) e exportação pra
+            SPSS/R/LaTeX ainda não estão implementados — avise se quiser priorizar isso
+            numa próxima etapa.
+
+        </p>
+
+    </div>
+
+    <div id="areaRelatorioCientifico" style="display:none">
+
+        <div class="toolbar">
+
+            <div class="toolbar-left">
+                <h3 id="tituloCientifico" style="margin:0"></h3>
+            </div>
+
+            <div class="toolbar-right no-print">
+                <button id="btnExportarPdfCientifico" class="btn btn-primary">
+                    Exportar PDF
+                </button>
+            </div>
+
+        </div>
+
+        <!-- TABELA 1: CARACTERIZAÇÃO DA AMOSTRA -->
+        <div class="card tabela-cientifica">
+
+            <h3>Tabela 1 — Caracterização da Amostra</h3>
+
+            <table class="table">
+
+                <tbody id="corpoCaracterizacao"></tbody>
+
+            </table>
+
+        </div>
+
+        <!-- TABELA 2: ESTATÍSTICA DESCRITIVA (VARIÁVEIS CONTÍNUAS) -->
+        <div class="card tabela-cientifica">
+
+            <h3>Tabela 2 — Estatística Descritiva (Variáveis Contínuas)</h3>
+
+            <div style="overflow-x:auto">
+
+                <table class="table" id="tabelaDescritiva">
+
+                    <thead>
+                        <tr>
+                            <th>Variável</th>
+                            <th>N</th>
+                            <th>Média</th>
+                            <th>DP</th>
+                            <th>EP</th>
+                            <th>CV%</th>
+                            <th>Mediana</th>
+                            <th>Moda</th>
+                            <th>Mín</th>
+                            <th>Máx</th>
+                            <th>Q1</th>
+                            <th>Q3</th>
+                            <th>IIQ</th>
+                            <th>IC95%</th>
+                            <th>Assimetria</th>
+                            <th>Curtose</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="corpoDescritiva"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- TABELA 3: VARIÁVEIS CATEGÓRICAS -->
+        <div class="card tabela-cientifica">
+
+            <h3>Tabela 3 — Distribuição das Classificações</h3>
+
+            <div id="areaCategoricas"></div>
+
+        </div>
+
+        <!-- TABELA 4: COMPARAÇÃO POR SEXO -->
+        <div class="card tabela-cientifica">
+
+            <h3>Tabela 4 — Estatística Descritiva por Sexo</h3>
+
+            <p style="color:#64748b; font-size:13px;">
+                Comparação descritiva (média ± desvio padrão). Não inclui teste de
+                hipótese (ex: valor-p) nessa versão.
+            </p>
+
+            <div style="overflow-x:auto">
+
+                <table class="table" id="tabelaPorSexo">
+
+                    <thead>
+                        <tr id="cabecalhoPorSexo"></tr>
+                    </thead>
+
+                    <tbody id="corpoPorSexo"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

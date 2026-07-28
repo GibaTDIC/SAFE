@@ -1,0 +1,2512 @@
+/* ==========================================================
+   SAFE - Sistema de Avaliação Física Escolar
+   Arquivo: global.css
+   Versão: 2.1 — visual mais moderno, amigável tanto pra
+   criança quanto pra quem está analisando os dados.
+   Fonte única de verdade dos componentes compartilhados
+   (card, modal, botões, toast, loader, tabela, paginação).
+   Os demais CSS (dashboard/forms/tables) só devem conter
+   regras específicas do próprio módulo, sem redefinir nada
+   que já exista aqui.
+========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+/* ===========================
+   RESET
+=========================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    height:100%;
+}
+
+/* ===========================
+   VARIÁVEIS
+=========================== */
+
+:root{
+
+    --cor-primaria:#2563EB;
+    --cor-secundaria:#3B82F6;
+    --cor-sucesso:#16A34A;
+    --cor-alerta:#F59E0B;
+    --cor-erro:#DC2626;
+
+    --cor-menu:#0F172A;
+    --cor-menu-hover:#1E293B;
+
+    --cor-fundo:#F1F5F9;
+    --cor-card:#FFFFFF;
+
+    --cor-texto:#1E293B;
+    --cor-texto-claro:#FFFFFF;
+
+    --borda:#E2E8F0;
+
+    --sombra:0 2px 10px rgba(30,41,59,.06);
+    --sombra-forte:0 8px 24px rgba(30,41,59,.08);
+    --sombra-hover:0 12px 28px rgba(37,99,235,.14);
+
+    --radius:16px;
+    --radius-pequeno:10px;
+
+}
+
+/* ===========================
+   BODY
+=========================== */
+
+body{
+
+    font-family:"Nunito", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+    background:var(--cor-fundo);
+
+    color:var(--cor-texto);
+
+}
+
+/* ===========================
+   LAYOUT
+=========================== */
+
+.container{
+
+    display:flex;
+
+    min-height:100vh;
+
+}
+
+.main{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.topbar{
+
+    height:70px;
+
+    background:#FFF;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    padding:0 30px;
+
+    box-shadow:var(--sombra);
+
+}
+
+.topbar h1{
+
+    font-size:24px;
+
+    color:var(--cor-primaria);
+
+}
+
+.usuario{
+
+    font-weight:600;
+
+    color:#555;
+
+}
+
+.area-usuario{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-end;
+
+    gap:4px;
+
+}
+
+.escola-atual-badge{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    padding:3px 10px;
+
+    border-radius:6px;
+
+    border:1px solid var(--borda);
+
+    font-size:12px;
+
+    font-weight:600;
+
+    color:var(--cor-primaria);
+
+    background:#F5F9FF;
+
+}
+
+.escola-atual-badge i{
+
+    font-size:13px;
+
+}
+
+.escola-atual-com-select{
+
+    padding-right:6px;
+
+}
+
+#seletorEscolaAtiva{
+
+    border:none;
+
+    background:none;
+
+    font-size:13px;
+
+    font-weight:600;
+
+    color:var(--cor-primaria);
+
+    cursor:pointer;
+
+}
+
+#content{
+
+    flex:1;
+
+    padding:30px;
+
+}
+
+footer{
+
+    height:45px;
+
+    background:#FFF;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    border-top:1px solid var(--borda);
+
+    font-size:14px;
+
+    color:#777;
+
+}
+
+/* ===========================
+   CABEÇALHO DE MÓDULO (usado por todas as páginas
+   carregadas dentro de #content: dashboard, turmas,
+   alunos, léger, etc.)
+=========================== */
+
+.page{
+
+    width:100%;
+
+    padding:25px;
+
+    box-sizing:border-box;
+
+}
+
+.page-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.page-title{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    color:#1e293b;
+
+}
+
+.page-subtitle{
+
+    color:#64748b;
+
+    margin-top:5px;
+
+}
+
+.module-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.module-header h2{
+
+    color:var(--cor-primaria);
+
+}
+
+/* ===========================
+   BARRA SUPERIOR (busca + ações) DAS TELAS DE LISTAGEM
+=========================== */
+
+.toolbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:20px;
+
+    margin-bottom:20px;
+
+    flex-wrap:wrap;
+
+}
+
+.toolbar-left{
+
+    display:flex;
+
+    gap:15px;
+
+    align-items:center;
+
+    flex:1;
+
+}
+
+.toolbar-right{
+
+    display:flex;
+
+    gap:15px;
+
+}
+
+/* ===========================
+   CARDS
+=========================== */
+
+.card{
+
+    background:var(--cor-card);
+
+    border-radius:var(--radius);
+
+    box-shadow:var(--sombra-forte);
+
+    padding:26px;
+
+    margin-bottom:24px;
+
+    border:1px solid var(--borda);
+
+    transition:box-shadow .2s, transform .2s;
+
+}
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:20px;
+
+}
+
+.cards .card{
+
+    text-align:center;
+
+    margin-bottom:0;
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.cards .card::before{
+
+    content:"";
+
+    position:absolute;
+
+    top:0;
+
+    left:0;
+
+    right:0;
+
+    height:5px;
+
+    background:linear-gradient(90deg, var(--cor-primaria), var(--cor-secundaria));
+
+}
+
+.cards .card:hover{
+
+    box-shadow:var(--sombra-hover);
+
+    transform:translateY(-3px);
+
+}
+
+.cards .card h3{
+
+    color:#64748B;
+
+    margin-bottom:12px;
+
+    font-weight:700;
+
+    font-size:14px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.4px;
+
+}
+
+.cards .card h1{
+
+    font-size:42px;
+
+    font-weight:800;
+
+    color:var(--cor-primaria);
+
+}
+
+/* ===========================
+   BOTÕES
+=========================== */
+
+button{
+
+    background:var(--cor-primaria);
+
+    color:#FFF;
+
+    border:none;
+
+    padding:12px 22px;
+
+    border-radius:var(--radius-pequeno);
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-family:inherit;
+
+    font-weight:700;
+
+    transition:.2s;
+
+}
+
+button:hover{
+
+    background:var(--cor-secundaria);
+
+    transform:translateY(-1px);
+
+}
+
+.btn{
+
+    border:none;
+
+    border-radius:var(--radius-pequeno);
+
+    padding:11px 20px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    font-family:inherit;
+
+    transition:.2s;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-1px);
+
+}
+
+.btn-primary{
+    background:var(--cor-primaria);
+    color:#FFF;
+    box-shadow:0 4px 12px rgba(37,99,235,.25);
+}
+
+.btn-primary:hover{
+    background:#1D4ED8;
+    box-shadow:0 6px 16px rgba(37,99,235,.32);
+}
+
+.btn-secondary{
+    background:#F1F5F9;
+    color:#334155;
+}
+
+.btn-secondary:hover{
+    background:#E2E8F0;
+}
+
+.btn-success{
+    background:var(--cor-sucesso);
+    color:#FFF;
+    box-shadow:0 4px 12px rgba(22,163,74,.25);
+}
+
+.btn-success:hover{
+    background:#15803D;
+}
+
+.btn-danger{
+    background:var(--cor-erro);
+    color:#FFF;
+    box-shadow:0 4px 12px rgba(220,38,38,.25);
+}
+
+.btn-danger:hover{
+    background:#B91C1C;
+}
+
+/* ===========================
+   CAMPOS / FORMULÁRIOS
+=========================== */
+
+input,
+select,
+textarea{
+
+    width:100%;
+
+    padding:11px 14px;
+
+    border:1.5px solid var(--borda);
+
+    border-radius:var(--radius-pequeno);
+
+    outline:none;
+
+    font-size:15px;
+
+    background:#FFF;
+
+    font-family:inherit;
+
+    transition:.15s;
+
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+
+    border-color:var(--cor-primaria);
+
+    box-shadow:0 0 0 4px rgba(37,99,235,.12);
+
+}
+
+.form-control{
+
+    width:100%;
+
+    padding:11px 14px;
+
+    border:1px solid var(--borda);
+
+    border-radius:8px;
+
+    font-size:15px;
+
+    transition:.2s;
+
+    outline:none;
+
+    background:#FFF;
+
+}
+
+.form-control:focus{
+
+    border-color:var(--cor-primaria);
+
+    box-shadow:0 0 0 3px rgba(21,101,192,.15);
+
+}
+
+.form-group{
+
+    display:flex;
+
+    flex-direction:column;
+
+    margin-bottom:18px;
+
+}
+
+.form-group label{
+
+    margin-bottom:6px;
+
+    font-weight:600;
+
+}
+
+/* Grid de 2 colunas usado nos formulários (Turmas, Alunos, Léger) */
+.form-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+
+    gap:15px;
+
+}
+
+/* Campo de pesquisa das telas de listagem (input direto, ex: alunos.html) */
+.search-box{
+
+    width:320px;
+
+    max-width:100%;
+
+}
+
+/* ===========================
+   TABELAS (skin padrão, usada por .table)
+=========================== */
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:#FFF;
+
+    border-radius:var(--radius-pequeno);
+
+    overflow:hidden;
+
+}
+
+.table thead{
+
+    background:#F8FAFC;
+
+}
+
+.table th{
+
+    padding:14px;
+
+    text-align:left;
+
+    font-size:13px;
+
+    font-weight:800;
+
+    color:#475569;
+
+    text-transform:uppercase;
+
+    letter-spacing:.3px;
+
+    border-bottom:2px solid var(--borda);
+
+}
+
+.table td{
+
+    padding:14px;
+
+    border-bottom:1px solid #F1F5F9;
+
+    font-size:14.5px;
+
+}
+
+.table tbody tr{
+
+    transition:.15s;
+
+}
+
+.table tbody tr:nth-child(even){
+
+    background:#FAFCFE;
+
+}
+
+.table tbody tr:hover{
+
+    background:#EFF6FF;
+
+}
+
+/* Ordenação de colunas (cabeçalhos clicáveis) */
+.sortable{
+
+    cursor:pointer;
+
+    user-select:none;
+
+    transition:.2s;
+
+}
+
+.sortable:hover{
+
+    color:var(--cor-secundaria);
+
+}
+
+/* Botões de ação dentro das linhas da tabela (editar/excluir) */
+.table-actions{
+
+    display:flex;
+
+    gap:8px;
+
+}
+
+.btn-icon{
+
+    width:36px;
+
+    height:36px;
+
+    border:none;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    color:#FFF;
+
+    transition:.2s;
+
+}
+
+.btn-edit{
+
+    background:var(--cor-secundaria);
+
+}
+
+.btn-delete{
+
+    background:var(--cor-erro);
+
+}
+
+.btn-icon:hover{
+
+    transform:scale(1.05);
+
+}
+
+/* ===========================
+   PAGINAÇÃO
+=========================== */
+
+.paginacao{
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:20px;
+
+    margin-top:20px;
+
+}
+
+.paginacao button{
+
+    padding:8px 18px;
+
+    border:none;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+    background:var(--cor-secundaria);
+
+    color:#FFF;
+
+    transition:.2s;
+
+}
+
+.paginacao button:hover{
+
+    background:#1259a7;
+
+}
+
+.paginacao button:disabled{
+
+    opacity:.45;
+
+    cursor:not-allowed;
+
+}
+
+.paginacao span{
+
+    font-weight:600;
+
+}
+
+/* ===========================
+   MODAL (cadastro/edição e confirmação)
+=========================== */
+
+.modal{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.4);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:999;
+
+}
+
+.modal.show{
+
+    display:flex;
+
+}
+
+.modal-content{
+
+    width:95%;
+
+    max-width:650px;
+
+    max-height:90vh;
+
+    overflow-y:auto;
+
+    background:#FFF;
+
+    border-radius:var(--radius);
+
+    padding:30px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+    animation:modal .25s;
+
+}
+
+.modal-footer,
+.acoes-modal{
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:10px;
+
+    margin-top:25px;
+
+}
+
+@keyframes modal{
+
+    from{
+
+        transform:translateY(-25px);
+
+        opacity:0;
+
+    }
+
+    to{
+
+        transform:translateY(0);
+
+        opacity:1;
+
+    }
+
+}
+
+/* ===========================
+   LOADER
+=========================== */
+
+.loader{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.35);
+
+    display:none;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:9998;
+
+}
+
+.loader-box{
+
+    background:#FFF;
+
+    padding:30px;
+
+    border-radius:var(--radius);
+
+    text-align:center;
+
+    min-width:240px;
+
+}
+
+.spinner{
+
+    width:45px;
+
+    height:45px;
+
+    border:5px solid #ddd;
+
+    border-top:5px solid var(--cor-secundaria);
+
+    border-radius:50%;
+
+    margin:auto;
+
+    animation:girar .8s linear infinite;
+
+}
+
+@keyframes girar{
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+/* ===========================
+   TOAST
+   Sistema único de aviso do sistema, criado dinamicamente
+   pelo utils.js (mostrarToast). Qualquer módulo novo pode
+   chamar mostrarToast() sem precisar declarar HTML próprio.
+=========================== */
+
+#safe-toast{
+
+    position:fixed;
+
+    right:25px;
+
+    bottom:25px;
+
+    background:var(--cor-primaria);
+
+    color:#FFF;
+
+    padding:14px 22px;
+
+    border-radius:8px;
+
+    display:none;
+
+    font-weight:bold;
+
+    box-shadow:0 5px 15px rgba(0,0,0,.3);
+
+    z-index:9999;
+
+    animation:fade .3s;
+
+}
+
+#safe-toast.erro{
+
+    background:var(--cor-erro);
+
+}
+
+#safe-toast.sucesso{
+
+    background:var(--cor-sucesso);
+
+}
+
+@keyframes fade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(15px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ===========================
+   RESPONSIVO
+=========================== */
+
+@media(max-width:900px){
+
+    .topbar{
+
+        flex-direction:column;
+
+        height:auto;
+
+        padding:15px;
+
+        gap:10px;
+
+    }
+}
+
+/* ===========================
+   GRÁFICO DE BARRAS (Estatísticas)
+=========================== */
+
+.linha-barra{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-bottom:10px;
+
+}
+
+.rotulo-barra{
+
+    width:150px;
+
+    flex-shrink:0;
+
+    font-size:14px;
+
+    color:var(--cor-texto);
+
+}
+
+.trilha-barra{
+
+    flex:1;
+
+    background:#EEF3F8;
+
+    border-radius:6px;
+
+    height:22px;
+
+    overflow:hidden;
+
+}
+
+.preenchimento-barra{
+
+    height:100%;
+
+    background:var(--cor-secundaria);
+
+    border-radius:6px;
+
+    transition:width .3s;
+
+}
+
+.valor-barra{
+
+    width:110px;
+
+    flex-shrink:0;
+
+    text-align:right;
+
+    font-size:13px;
+
+    color:#64748b;
+
+}
+
+/* ===========================
+   RELATÓRIO CIENTÍFICO (tabelas sóbrias, sem decoração)
+=========================== */
+
+.tabela-cientifica table{
+
+    font-size:13px;
+
+}
+
+.tabela-cientifica th{
+
+    background:#F1F5F9 !important;
+
+    color:#1E293B !important;
+
+    font-weight:700;
+
+}
+
+.tabela-cientifica td, .tabela-cientifica th{
+
+    border:1px solid #CBD5E1;
+
+    padding:8px 10px;
+
+}
+
+.tabela-cientifica tbody tr:nth-child(even){
+
+    background:#FAFAFA;
+
+}
+
+@media print{
+
+    .tabela-cientifica{
+
+        box-shadow:none;
+
+        border:1px solid #000;
+
+    }
+
+    .tabela-cientifica th, .tabela-cientifica td{
+
+        border:1px solid #000;
+
+    }
+}
+
+/* ===========================
+   COLETA EM CAMPO — Avaliações Físicas (novo padrão)
+=========================== */
+
+.avaliacao-campo{
+
+    --cor-teste: var(--cor-primaria);
+
+}
+
+.cabecalho-teste{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+    background:linear-gradient(135deg, color-mix(in srgb, var(--cor-teste) 12%, white), white);
+
+    border:1px solid color-mix(in srgb, var(--cor-teste) 25%, white);
+
+    border-left:6px solid var(--cor-teste);
+
+    border-radius:var(--radius);
+
+    padding:16px 20px;
+
+    margin-bottom:14px;
+
+}
+
+.cabecalho-teste-icone img{
+
+    width:56px;
+
+    height:56px;
+
+    object-fit:contain;
+
+}
+
+.cabecalho-teste-info h1{
+
+    font-size:22px;
+
+    color:var(--cor-teste);
+
+    margin-bottom:2px;
+
+}
+
+.cabecalho-teste-info p{
+
+    color:#64748b;
+
+    font-size:13.5px;
+
+    margin-bottom:8px;
+
+}
+
+.cabecalho-teste-meta{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:14px;
+
+    font-size:12.5px;
+
+    color:#475569;
+}
+
+.btn-como-executar{
+
+    display:block;
+
+    width:100%;
+
+    background:var(--cor-teste);
+
+    color:#FFF;
+
+    border:none;
+
+    padding:16px;
+
+    border-radius:var(--radius-pequeno);
+
+    font-size:17px;
+
+    font-weight:800;
+
+    cursor:pointer;
+
+    margin-bottom:14px;
+
+    box-shadow:0 6px 18px color-mix(in srgb, var(--cor-teste) 35%, transparent);
+
+    transition:.2s;
+
+}
+
+.btn-como-executar:hover{
+
+    transform:translateY(-2px);
+
+    filter:brightness(1.08);
+
+}
+
+.info-teste-resumo{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:16px;
+
+    background:#F8FAFC;
+
+    border-radius:var(--radius-pequeno);
+
+    padding:10px 16px;
+
+    font-size:13px;
+
+    color:#475569;
+
+    margin-bottom:14px;
+
+}
+
+/* Barra de progresso */
+
+.barra-progresso-container{
+
+    background:var(--cor-card);
+
+    border:1px solid var(--borda);
+
+    border-radius:var(--radius);
+
+    padding:16px 20px;
+
+    margin-bottom:14px;
+
+}
+
+.barra-progresso-topo{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+}
+
+.barra-progresso-trilha{
+
+    height:14px;
+
+    background:#E2E8F0;
+
+    border-radius:8px;
+
+    overflow:hidden;
+
+}
+
+.barra-progresso-preenchimento{
+
+    height:100%;
+
+    background:linear-gradient(90deg, var(--cor-secundaria), var(--cor-sucesso));
+
+    transition:width .3s;
+
+}
+
+.barra-progresso-status{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:10px;
+
+    flex-wrap:wrap;
+
+}
+
+.status-pill{
+
+    font-size:12.5px;
+
+    font-weight:700;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+}
+
+.status-pill.status-concluido{ background:#DCFCE7; color:#166534; }
+.status-pill.status-pendente{ background:#FEF3C7; color:#92400E; }
+.status-pill.status-ausente{ background:#F1F5F9; color:#64748b; }
+
+/* Painel de filtros */
+
+.painel-filtros{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    align-items:center;
+
+    gap:10px;
+
+    margin-bottom:16px;
+
+}
+
+.painel-filtros input{
+
+    flex:1;
+
+    min-width:180px;
+
+}
+
+.filtros-situacao{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:6px;
+
+}
+
+.filtro-situacao{
+
+    background:#F1F5F9;
+
+    color:#475569;
+
+    border:none;
+
+    padding:8px 14px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:.15s;
+}
+
+.filtro-situacao.ativo{
+
+    background:var(--cor-teste, var(--cor-primaria));
+
+    color:#FFF;
+
+}
+
+.navegacao-alunos{
+
+    display:flex;
+
+    gap:8px;
+
+}
+
+/* Grid de cards de aluno */
+
+.grid-cards-alunos{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+
+    gap:12px;
+
+}
+
+.card-aluno-campo{
+
+    background:var(--cor-card);
+
+    border:1px solid var(--borda);
+
+    border-radius:var(--radius-pequeno);
+
+    padding:14px;
+
+    transition:.2s;
+}
+
+.card-aluno-campo.esmaecido{
+
+    opacity:.55;
+}
+
+.card-aluno-topo{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-bottom:4px;
+
+}
+
+.card-aluno-nome{
+
+    font-weight:800;
+
+    font-size:14.5px;
+
+    cursor:pointer;
+
+}
+
+.card-aluno-nome:hover{
+
+    text-decoration:underline;
+
+    color:var(--cor-teste, var(--cor-primaria));
+
+}
+
+.badge-status{
+
+    font-size:11px;
+
+    font-weight:800;
+
+    padding:3px 9px;
+
+    border-radius:20px;
+
+    white-space:nowrap;
+}
+
+.badge-status.concluido{ background:#DCFCE7; color:#166534; }
+.badge-status.pendente{ background:#FEF3C7; color:#92400E; }
+.badge-status.ausente{ background:#F1F5F9; color:#64748b; }
+
+.card-aluno-meta{
+
+    font-size:12px;
+
+    color:#94a3b8;
+
+    margin-bottom:6px;
+
+}
+
+.card-aluno-ultimo{
+
+    font-size:12.5px;
+
+    color:#475569;
+
+    margin-bottom:10px;
+
+    padding-bottom:10px;
+
+    border-bottom:1px dashed var(--borda);
+
+}
+
+.card-aluno-entrada{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:6px;
+
+}
+
+.card-aluno-entrada .input-resultado{
+
+    flex:1;
+
+    min-width:90px;
+
+    padding:10px;
+
+    font-size:16px;
+
+    text-align:center;
+
+    font-weight:700;
+
+}
+
+.card-aluno-entrada .btn-salvar-card{
+
+    padding:10px 14px;
+
+    font-size:13px;
+
+    white-space:nowrap;
+
+}
+
+.btn-ausente-card{
+
+    background:#F1F5F9;
+
+    border:none;
+
+    border-radius:var(--radius-pequeno);
+
+    padding:10px 12px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+}
+
+/* Painel lateral de histórico rápido */
+
+.painel-lateral{
+
+    position:fixed;
+
+    top:0;
+
+    right:-100%;
+
+    width:min(380px, 90vw);
+
+    height:100vh;
+
+    background:var(--cor-card);
+
+    box-shadow:-8px 0 24px rgba(0,0,0,.15);
+
+    z-index:1000;
+
+    transition:right .25s ease;
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.painel-lateral.aberto{
+
+    right:0;
+
+}
+
+.painel-lateral-topo{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 20px;
+
+    border-bottom:1px solid var(--borda);
+
+}
+
+.painel-lateral-topo button{
+
+    background:none;
+
+    border:none;
+
+    font-size:24px;
+
+    cursor:pointer;
+
+    color:#94a3b8;
+
+    padding:0;
+
+}
+
+.painel-lateral-corpo{
+
+    padding:16px 20px;
+
+    overflow-y:auto;
+
+    flex:1;
+
+}
+
+.linha-historico-lateral{
+
+    padding:12px 0;
+
+    border-bottom:1px solid #F1F5F9;
+
+}
+
+.linha-historico-lateral-data{
+
+    font-size:12px;
+
+    color:#94a3b8;
+
+}
+
+.linha-historico-lateral-valor{
+
+    font-size:18px;
+
+    font-weight:800;
+
+    color:var(--cor-texto);
+
+}
+
+.linha-historico-lateral-classificacao{
+
+    font-size:12.5px;
+
+    color:#475569;
+
+}
+
+.fundo-painel-lateral{
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(15,23,42,.4);
+
+    z-index:999;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:opacity .25s;
+
+}
+
+.fundo-painel-lateral.aberto{
+
+    opacity:1;
+
+    pointer-events:auto;
+
+}
+
+/* Modal "Como Executar" */
+
+.modal-como-executar-conteudo{
+
+    max-width:560px;
+
+    max-height:85vh;
+
+    overflow-y:auto;
+
+}
+
+.modal-como-executar-conteudo h4{
+
+    margin-top:16px;
+
+    margin-bottom:6px;
+
+    font-size:14.5px;
+
+}
+
+.lista-como-executar{
+
+    padding-left:20px;
+
+    font-size:14px;
+
+    color:#475569;
+
+}
+
+.lista-como-executar li{
+
+    margin-bottom:5px;
+
+}
+
+@media (max-width:600px){
+
+    .cabecalho-teste{
+
+        flex-direction:column;
+
+        text-align:center;
+
+    }
+
+    .painel-filtros{
+
+        flex-direction:column;
+
+        align-items:stretch;
+    }
+
+    .grid-cards-alunos{
+
+        grid-template-columns:1fr;
+
+    }
+}
+
+/* ===========================
+   DASHBOARD DA ESCOLA (SAFE Score)
+=========================== */
+
+.subtitulo-relatorio{
+
+    color:#64748b;
+
+    font-size:14px;
+
+    margin-bottom:14px;
+
+}
+
+.linha-ranking{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:12px 14px;
+
+    border-radius:var(--radius-pequeno, 10px);
+
+    margin-bottom:8px;
+
+    background:#F8FAFC;
+
+    cursor:pointer;
+
+    transition:.15s;
+
+}
+
+.linha-ranking:hover{
+
+    background:#EFF6FF;
+
+    transform:translateX(3px);
+
+}
+
+.linha-ranking-nome{
+
+    font-weight:700;
+
+    color:var(--cor-texto);
+
+}
+
+.linha-ranking-score{
+
+    font-weight:800;
+
+}
+
+.cards-distribuicao{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+
+    gap:16px;
+
+}
+
+.card-distribuicao{
+
+    text-align:center;
+
+    padding:20px;
+
+}
+
+.card-distribuicao h1{
+
+    font-size:34px;
+
+}
+
+/* ===========================
+   GRÁFICO COMPARATIVO ENTRE TURMAS (Relatório de Escola)
+=========================== */
+
+.grafico-comparativo-turmas{
+
+    display:flex;
+
+    align-items:flex-end;
+
+    gap:14px;
+
+    height:180px;
+
+    padding:20px 10px 0;
+
+    margin-bottom:20px;
+
+    overflow-x:auto;
+
+}
+
+.barra-comparativa-item{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+    justify-content:flex-end;
+
+    min-width:60px;
+
+    height:100%;
+
+    cursor:pointer;
+
+}
+
+.barra-comparativa-valor{
+
+    font-size:13px;
+
+    font-weight:800;
+
+    color:var(--cor-primaria);
+
+    margin-bottom:4px;
+
+}
+
+.barra-comparativa-coluna{
+
+    width:36px;
+
+    min-height:4px;
+
+    background:linear-gradient(180deg, var(--cor-secundaria), var(--cor-primaria));
+
+    border-radius:8px 8px 3px 3px;
+
+    transition:.2s;
+
+}
+
+.barra-comparativa-item:hover .barra-comparativa-coluna{
+
+    filter:brightness(1.1);
+
+    transform:scaleX(1.08);
+
+}
+
+.barra-comparativa-rotulo{
+
+    margin-top:8px;
+
+    font-size:11.5px;
+
+    color:#64748b;
+
+    text-align:center;
+
+    max-width:70px;
+
+}
+
+/* ===========================
+   LEGENDA DE TESTES (Relatório de Turma)
+=========================== */
+
+.legenda-testes{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:14px;
+
+    margin:12px 0 16px;
+
+    padding:10px 14px;
+
+    background:#F8FAFC;
+
+    border-radius:var(--radius-pequeno, 10px);
+
+}
+
+.legenda-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    font-size:12.5px;
+
+    color:#475569;
+
+}
+
+.legenda-cor{
+
+    width:10px;
+
+    height:10px;
+
+    border-radius:50%;
+
+    display:inline-block;
+
+}
+
+/* ===========================
+   BARRA DE POSIÇÃO (aluno único)
+=========================== */
+
+.barra-posicao-container{
+
+    margin-top:6px;
+
+}
+
+.barra-posicao-trilha{
+
+    position:relative;
+
+    height:26px;
+
+    border-radius:8px;
+
+    overflow:visible;
+
+}
+
+.marcador-posicao{
+
+    position:absolute;
+
+    top:-6px;
+
+    transform:translateX(-50%);
+
+    width:0;
+
+    height:0;
+
+    border-left:9px solid transparent;
+
+    border-right:9px solid transparent;
+
+    border-top:14px solid #0F172A;
+
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));
+
+}
+
+.marcador-posicao-valor{
+
+    position:absolute;
+
+    bottom:16px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    background:#0F172A;
+
+    color:#FFF;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    padding:3px 8px;
+
+    border-radius:6px;
+
+    white-space:nowrap;
+
+}
+
+.barra-posicao-legendas{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-top:6px;
+
+    font-size:11px;
+
+    color:#64748b;
+
+}
+
+.barra-posicao-legendas span{
+
+    flex:1;
+
+    text-align:center;
+
+}
+
+.barra-posicao-legendas span:first-child{
+
+    text-align:left;
+
+}
+
+.barra-posicao-legendas span:last-child{
+
+    text-align:right;
+
+}
+
+.barra-posicao-resultado{
+
+    margin-top:8px;
+
+    font-size:14px;
+
+    color:var(--cor-texto);
+
+}
+
+/* ===========================
+   ÍCONE + POP-UP DE INFORMAÇÃO DO TESTE
+=========================== */
+
+.icone-teste{
+
+    border-radius:6px;
+
+    object-fit:cover;
+
+    cursor:pointer;
+
+    vertical-align:middle;
+
+    margin-right:10px;
+
+    border:1px solid var(--borda);
+
+    transition:.2s;
+
+}
+
+.icone-teste:hover{
+
+    transform:scale(1.08);
+
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+
+}
+
+.modal-info-teste{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(15,23,42,.55);
+
+    align-items:center;
+
+    justify-content:center;
+
+    z-index:1000;
+
+    padding:20px;
+
+}
+
+.modal-info-teste.show{
+
+    display:flex;
+
+}
+
+.modal-info-teste-conteudo{
+
+    background:#FFF;
+
+    border-radius:14px;
+
+    max-width:480px;
+
+    width:100%;
+
+    max-height:85vh;
+
+    overflow-y:auto;
+
+    padding:24px;
+
+    position:relative;
+
+    text-align:center;
+
+}
+
+.modal-info-teste-conteudo img{
+
+    max-width:100%;
+
+    border-radius:10px;
+
+    margin-bottom:16px;
+
+}
+
+.modal-info-teste-conteudo h3{
+
+    color:var(--cor-primaria);
+
+    margin-bottom:10px;
+
+}
+
+.modal-info-teste-conteudo p{
+
+    color:#475569;
+
+    font-size:14px;
+
+    text-align:left;
+
+    line-height:1.5;
+
+}
+
+.fechar-info-teste{
+
+    position:absolute;
+
+    top:10px;
+
+    right:14px;
+
+    background:none;
+
+    border:none;
+
+    font-size:26px;
+
+    line-height:1;
+
+    color:#94a3b8;
+
+    cursor:pointer;
+
+}
+
+.fechar-info-teste:hover{
+
+    color:#475569;
+
+}
+
+.linha-barra-clicavel{
+
+    cursor:pointer;
+
+    border-radius:6px;
+
+    transition:.15s;
+
+    padding:4px 6px;
+
+    margin:0 -6px 10px -6px;
+
+}
+
+.linha-barra-clicavel:hover{
+
+    background:#F1F5F9;
+
+}
+
+.lista-alunos-nivel{
+
+    list-style:none;
+
+    margin:10px 0 0;
+
+    padding:0;
+
+    max-height:340px;
+
+    overflow-y:auto;
+
+}
+
+.lista-alunos-nivel li{
+
+    padding:10px 12px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    color:var(--cor-texto);
+
+}
+
+.lista-alunos-nivel li:hover{
+
+    background:#F1F5F9;
+
+    color:var(--cor-primaria);
+
+}
+
+/* ===========================
+   FICHA DE AVALIAÇÃO (impressão)
+=========================== */
+
+.ficha-impressao{
+
+    max-width:650px;
+
+    margin:0 auto 40px;
+
+    page-break-after:always;
+
+    border:1px solid #000;
+
+    padding:16px;
+
+    position:relative;
+
+}
+
+.ficha-marca-canto{
+
+    position:absolute;
+
+    top:10px;
+
+    right:14px;
+
+}
+
+.ficha-marca-canto img{
+
+    width:40px;
+
+    height:40px;
+
+    object-fit:contain;
+
+    opacity:.85;
+
+}
+
+.ficha-cabecalho-safe{
+
+    text-align:center;
+
+    margin-bottom:14px;
+
+}
+
+.ficha-cabecalho-safe h2{
+
+    font-size:26px;
+
+    font-weight:800;
+
+    color:var(--cor-primaria);
+
+    letter-spacing:2px;
+
+    margin:0;
+
+}
+
+.ficha-cabecalho-safe span{
+
+    font-size:12px;
+
+    color:#64748b;
+
+}
+
+.tabela-ficha{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    font-size:12.5px;
+
+}
+
+.tabela-ficha td{
+
+    border:1px solid #000;
+
+    padding:6px 8px;
+
+    vertical-align:top;
+
+}
+
+.ficha-subtitulo{
+
+    text-align:center;
+
+    font-weight:700;
+
+    background:#F1F5F9;
+
+}
+
+.ficha-referencia{
+
+    margin-top:10px;
+
+    font-size:10px;
+
+    color:#94a3b8;
+
+    line-height:1.4;
+
+}
+
+@media print{
+
+    .ficha-impressao{
+
+        page-break-after:always;
+
+        border:1px solid #000;
+
+    }
+
+    .ficha-impressao:last-child{
+
+        page-break-after:auto;
+
+    }
+}
+
+/* ===========================
+   IMPRESSÃO (exportar PDF)
+   Elementos com .no-print somem; o resto do #content
+   (relatório) ocupa a página inteira, sem menu/topo.
+=========================== */
+
+@media print{
+
+    .sidebar,
+    .topbar,
+    footer,
+    .no-print{
+
+        display:none !important;
+
+    }
+
+    .container,
+    .main,
+    #content{
+
+        display:block;
+
+        width:100%;
+
+        padding:0;
+
+        margin:0;
+
+    }
+
+    body{
+
+        background:#FFF;
+
+    }
+
+    .card{
+
+        box-shadow:none;
+
+        border:1px solid #E2E8F0;
+
+        break-inside:avoid;
+
+    }
+
+}

@@ -1,0 +1,191 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+                Dashboard da Escola
+            </div>
+
+            <div class="page-subtitle">
+                Visão geral rápida — a situação da escola em segundos.
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="card no-print">
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>Escola</label>
+
+                <select id="escolaRelEscola" class="form-control">
+                    <option value="">Selecione...</option>
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="areaRelatorioEscola" style="display:none">
+
+        <div class="toolbar">
+
+            <div class="toolbar-left">
+                <h3 id="tituloEscolaRel" style="margin:0"></h3>
+            </div>
+
+            <div class="toolbar-right no-print">
+                <button id="btnExportarPdfEscola" class="btn btn-primary">
+                    Exportar PDF
+                </button>
+            </div>
+
+        </div>
+
+        <!-- CARDS RESUMO -->
+        <div id="cardsResumoEscola" class="cards"></div>
+
+        <!-- RANKING DE TURMAS -->
+        <div class="card">
+
+            <h3>Ranking das Turmas</h3>
+
+            <p class="subtitulo-relatorio">Da pior pra melhor. Clique numa turma pra ver o ranking dos alunos dela.</p>
+
+            <div id="rankingTurmasEscola"></div>
+
+        </div>
+
+        <!-- RANKING DE TESTES (maior incidência de risco) -->
+        <div class="card">
+
+            <h3>Capacidades Físicas com Maior Incidência de Risco</h3>
+
+            <p class="subtitulo-relatorio">Quais testes têm mais alunos na faixa de risco, do pior pro melhor.</p>
+
+            <div id="rankingTestesEscola"></div>
+
+        </div>
+
+        <!-- DISTRIBUIÇÃO GERAL -->
+        <div class="card">
+
+            <h3>Distribuição Geral</h3>
+
+            <p class="subtitulo-relatorio">Considerando o SAFE Score mais recente de cada aluno.</p>
+
+            <div id="distribuicaoGeralEscola" class="cards-distribuicao"></div>
+
+        </div>
+
+        <!-- DETALHES (tabela completa, só sob demanda) -->
+        <div class="card no-print">
+
+            <button id="btnToggleDetalhesEscola" class="btn-secondary">
+                Ver tabela detalhada por turma e teste ▾
+            </button>
+
+            <div id="areaDetalhesEscola" style="display:none; margin-top:16px;">
+
+                <p class="subtitulo-relatorio">
+                    Cada célula mostra quantas avaliações daquele teste já foram
+                    registradas na turma. Clique numa turma pra ver o detalhe.
+                </p>
+
+                <div style="overflow-x:auto">
+
+                    <table class="table" id="tabelaEscolaRel">
+
+                        <thead>
+                            <tr id="cabecalhoEscolaRel"></tr>
+                        </thead>
+
+                        <tbody id="corpoEscolaRel"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- POP-UP: DETALHE DE APLICAÇÃO DOS TESTES NA TURMA -->
+<div id="modalTurmaEscola" class="modal modal-estatisticas">
+
+    <div class="modal-content" style="max-width:400px;">
+
+        <button class="fechar-modal-turma-escola" type="button" style="float:right; background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8;">&times;</button>
+
+        <h3 id="tituloModalTurmaEscola"></h3>
+
+        <p id="subtituloModalTurmaEscola" style="color:#64748b; font-size:13px;"></p>
+
+        <div id="corpoModalTurmaEscola" style="margin-top:10px;"></div>
+
+    </div>
+
+</div>
+
+<!-- POP-UP: RANKING DE ALUNOS DA TURMA -->
+<div id="modalRankingTurma" class="modal modal-estatisticas">
+
+    <div class="modal-content" style="max-width:420px;">
+
+        <button class="fechar-modal-ranking-turma" type="button" style="float:right; background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8;">&times;</button>
+
+        <h3 id="tituloModalRankingTurma"></h3>
+
+        <p id="subtituloModalRankingTurma" style="color:#64748b; font-size:13px;"></p>
+
+        <div id="corpoModalRankingTurma" style="margin-top:10px; max-height:380px; overflow-y:auto;"></div>
+
+    </div>
+
+</div>
+
+<!-- POP-UP: ALUNOS DE UMA FAIXA DO SAFE SCORE -->
+<div id="modalClassificacaoEscola" class="modal modal-estatisticas">
+
+    <div class="modal-content" style="max-width:420px;">
+
+        <button class="fechar-modal-classificacao-escola" type="button" style="float:right; background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8;">&times;</button>
+
+        <h3 id="tituloModalClassificacaoEscola"></h3>
+
+        <p id="subtituloModalClassificacaoEscola" style="color:#64748b; font-size:13px;"></p>
+
+        <div id="corpoModalClassificacaoEscola" style="margin-top:10px; max-height:380px; overflow-y:auto;"></div>
+
+    </div>
+
+</div>
+
+<!-- POP-UP: DETALHE DO TESTE (quais turmas têm mais risco) -->
+<div id="modalTesteEscola" class="modal modal-estatisticas">
+
+    <div class="modal-content" style="max-width:420px;">
+
+        <button class="fechar-modal-teste-escola" type="button" style="float:right; background:none; border:none; font-size:22px; cursor:pointer; color:#94a3b8;">&times;</button>
+
+        <h3 id="tituloModalTesteEscola"></h3>
+
+        <p id="subtituloModalTesteEscola" style="color:#64748b; font-size:13px;"></p>
+
+        <div id="corpoModalTesteEscola" style="margin-top:10px; max-height:380px; overflow-y:auto;"></div>
+
+    </div>
+
+</div>

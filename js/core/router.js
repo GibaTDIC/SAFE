@@ -166,6 +166,13 @@ export async function loadPage(page){
 
         content.innerHTML=await resposta.text();
 
+        // Toda vez que abrir uma página nova, começa do topo — sem isso,
+        // se o usuário tivesse rolado o menu ou o conteúdo anterior pra
+        // baixo, a nova página abria já deslocada.
+        window.scrollTo(0, 0);
+
+        content.scrollTop = 0;
+
         marcarMenu(page);
 
         // JS

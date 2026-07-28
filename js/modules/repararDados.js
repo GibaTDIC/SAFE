@@ -24,6 +24,7 @@ import{
 from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 const COLECOES_AVALIACAO = [
+    "avaliacoes_circunferenciacintura",
     "avaliacoes_leger",
     "avaliacoes_imc",
     "avaliacoes_flexibilidade",

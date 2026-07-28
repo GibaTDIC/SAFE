@@ -16,132 +16,132 @@ const routes = {
 
     dashboard:{
     html:"pages/dashboard/dashboard.html",
-    js:"js/modules/dashboard.js"
+    js:"./js/modules/dashboard.js"
    },
 
     turmas:{
     html:"pages/gestao/turmas.html",
-    js:"js/modules/turmas.js"
+    js:"./js/modules/turmas.js"
    },
 
     alunos:{
     html:"pages/gestao/alunos.html",
-    js:"js/modules/aluno.js"
+    js:"./js/modules/aluno.js"
    },
 
     escolas:{
     html:"pages/gestao/escolas.html",
-    js:"js/modules/escolas.js"
+    js:"./js/modules/escolas.js"
    },
 
     professores:{
     html:"pages/gestao/professores.html",
-    js:"js/modules/professores.js"
+    js:"./js/modules/professores.js"
    },
 
     leger:{
     html:"pages/avaliacoes/leger.html",
-    js:"js/modules/leger.js"
+    js:"./js/modules/leger.js"
    },
 
     circunferenciacintura:{
     html:"pages/avaliacoes/circunferenciacintura.html",
-    js:"js/modules/circunferenciacintura.js"
+    js:"./js/modules/circunferenciacintura.js"
    },
 
     imc:{
     html:"pages/avaliacoes/imc.html",
-    js:"js/modules/imc.js"
+    js:"./js/modules/imc.js"
    },
 
     flexibilidade:{
     html:"pages/avaliacoes/flexibilidade.html",
-    js:"js/modules/flexibilidade.js"
+    js:"./js/modules/flexibilidade.js"
    },
 
     abdominal:{
     html:"pages/avaliacoes/abdominal.html",
-    js:"js/modules/abdominal.js"
+    js:"./js/modules/abdominal.js"
    },
 
     medicineball:{
     html:"pages/avaliacoes/medicineball.html",
-    js:"js/modules/medicineball.js"
+    js:"./js/modules/medicineball.js"
    },
 
     saltohorizontal:{
     html:"pages/avaliacoes/saltohorizontal.html",
-    js:"js/modules/saltohorizontal.js"
+    js:"./js/modules/saltohorizontal.js"
    },
 
     agilidade:{
     html:"pages/avaliacoes/agilidade.html",
-    js:"js/modules/agilidade.js"
+    js:"./js/modules/agilidade.js"
    },
 
     corrida20m:{
     html:"pages/avaliacoes/corrida20m.html",
-    js:"js/modules/corrida20m.js"
+    js:"./js/modules/corrida20m.js"
    },
 
     corrida6min:{
     html:"pages/avaliacoes/corrida6min.html",
-    js:"js/modules/corrida6min.js"
+    js:"./js/modules/corrida6min.js"
    },
 
     tgmd3:{
     html:"pages/avaliacoes/tgmd3.html",
-    js:"js/modules/tgmd3.js"
+    js:"./js/modules/tgmd3.js"
    },
 
     relatorios:{
     html:"pages/relatorios/relatorios.html",
-    js:"js/modules/relatorios.js"
+    js:"./js/modules/relatorios.js"
    },
 
     relatorioIndividual:{
     html:"pages/relatorios/relatorioIndividual.html",
-    js:"js/modules/relatorioIndividual.js"
+    js:"./js/modules/relatorioIndividual.js"
    },
 
     relatorioTurma:{
     html:"pages/relatorios/relatorioTurma.html",
-    js:"js/modules/relatorioTurma.js"
+    js:"./js/modules/relatorioTurma.js"
    },
 
     relatorioEscola:{
     html:"pages/relatorios/relatorioEscola.html",
-    js:"js/modules/relatorioEscola.js"
+    js:"./js/modules/relatorioEscola.js"
    },
 
     repararDados:{
     html:"pages/administracao/repararDados.html",
-    js:"js/modules/repararDados.js"
+    js:"./js/modules/repararDados.js"
    },
 
     relatorioEstatisticas:{
     html:"pages/relatorios/relatorioEstatisticas.html",
-    js:"js/modules/relatorioEstatisticas.js"
+    js:"./js/modules/relatorioEstatisticas.js"
    },
 
     fichaAvaliacao:{
     html:"pages/relatorios/fichaAvaliacao.html",
-    js:"js/modules/fichaAvaliacao.js"
+    js:"./js/modules/fichaAvaliacao.js"
    },
 
     relatorioCientifico:{
     html:"pages/relatorios/relatorioCientifico.html",
-    js:"js/modules/relatorioCientifico.js"
+    js:"./js/modules/relatorioCientifico.js"
    },
 
     configuracoes:{
     html:"pages/administracao/configuracoes.html",
-    js:"js/modules/configuracoes.js"
+    js:"./js/modules/configuracoes.js"
    },
 
     backup:{
     html:"pages/administracao/backup.html",
-    js:"js/modules/backup.js"
+    js:"./js/modules/backup.js"
    },
 
 };

@@ -39,6 +39,16 @@ const routes = {
     js:"../modules/professores.js"
    },
 
+    funcionarios:{
+    html:"pages/gestao/funcionarios.html",
+    js:"../modules/funcionarios.js"
+   },
+
+    antropometriaAdulto:{
+    html:"pages/avaliacoes/antropometriaAdulto.html",
+    js:"../modules/antropometriaAdulto.js"
+   },
+
     leger:{
     html:"pages/avaliacoes/leger.html",
     js:"../modules/leger.js"

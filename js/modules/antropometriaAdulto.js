@@ -1,16 +1,13 @@
 // ======================================================
 // SAFE
-// Módulo: Teste de Léger (ADULTOS)
+// Módulo: Antropometria Adulta (IMC, RCE e % de Gordura)
 //
-// Léger não faz parte da bateria PROESP-Br (que é só pra
-// alunos, 6-17 anos) — é aplicado separadamente aos
-// funcionários adultos da escola (professores, motoristas,
-// zeladores etc.), cadastrados em js/modules/funcionarios.js.
-//
-// ATENÇÃO — funções exportadas daqui (calcularResultadoLeger,
-// converterVoltasParaEstagio, ESTAGIOS_LEGER) também são
-// usadas por outros módulos. `calcularIdade` está em
-// js/core/utils.js (usada por praticamente todo módulo).
+// Aplicado só aos funcionários adultos da escola (ver
+// js/modules/funcionarios.js) — não faz parte da bateria
+// PROESP-Br, que é só pra alunos (6-17 anos). Reúne numa
+// única tela as 3 medidas que normalmente são coletadas
+// juntas: peso/estatura (IMC), cintura (RCE) e 4 dobras
+// cutâneas (% de gordura).
 // ======================================================
 
 import { db } from "../core/firebase.js";
@@ -25,250 +22,119 @@ import {
 
 import { iconeTeste, iniciarPopupTestes, iniciarModalComoExecutar } from "../core/testeInfoUI.js";
 
+import { calcularRCE, classificarSaude as classificarRCEAdulto } from "./circunferenciacintura.js";
+
 import{
     collection,
     addDoc,
     getDocs,
     query,
     where,
-    orderBy,
     Timestamp
 }
 from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 // ======================================================
-// TABELA OFICIAL DE ESTÁGIOS (Léger 20m Shuttle Run)
-// velocidade em km/h, voltas = quantidade de tiros de 20m
-// naquele estágio, acumulado = total de tiros até o fim
-// do estágio (inclusive).
-// Índice 0 não é usado (estágio começa em 1).
+// IMC — classificação OMS pra adultos (diferente da tabela
+// por idade/sexo do PROESP-Br, que é só pra crianças —
+// ver js/modules/imc.js). Fonte: OMS, faixas de IMC padrão
+// pra adultos (18+), amplamente publicadas e estáveis.
 // ======================================================
 
-export const ESTAGIOS_LEGER = [
+export function calcularIMCAdulto(pesoKg, estaturaCm){
 
-    null,
-    { nivel:1,  velocidade:8.0,  voltas:7,  acumulado:7   },
-    { nivel:2,  velocidade:9.0,  voltas:8,  acumulado:15  },
-    { nivel:3,  velocidade:9.5,  voltas:8,  acumulado:23  },
-    { nivel:4,  velocidade:10.0, voltas:9,  acumulado:32  },
-    { nivel:5,  velocidade:10.5, voltas:9,  acumulado:41  },
-    { nivel:6,  velocidade:11.0, voltas:10, acumulado:51  },
-    { nivel:7,  velocidade:11.5, voltas:10, acumulado:61  },
-    { nivel:8,  velocidade:12.0, voltas:11, acumulado:72  },
-    { nivel:9,  velocidade:12.5, voltas:11, acumulado:83  },
-    { nivel:10, velocidade:13.0, voltas:11, acumulado:94  },
-    { nivel:11, velocidade:13.5, voltas:12, acumulado:106 },
-    { nivel:12, velocidade:14.0, voltas:12, acumulado:118 },
-    { nivel:13, velocidade:14.5, voltas:13, acumulado:131 },
-    { nivel:14, velocidade:15.0, voltas:13, acumulado:144 },
-    { nivel:15, velocidade:15.5, voltas:13, acumulado:157 },
-    { nivel:16, velocidade:16.0, voltas:14, acumulado:171 },
-    { nivel:17, velocidade:16.5, voltas:14, acumulado:185 }
+    const estaturaM = estaturaCm / 100;
 
-];
+    return pesoKg / (estaturaM * estaturaM);
 
-// TODO: tabela confirmada até o estágio 17. Se algum funcionário muito
-// condicionado ultrapassar isso, precisamos validar e completar os
-// estágios seguintes antes de confiar no cálculo.
+}
 
-// ======================================================
-// CLASSIFICAÇÃO — APTIDÃO CARDIORRESPIRATÓRIA EM ADULTOS
-// Fonte: tabela normativa de VO2máx por sexo e faixa etária,
-// amplamente publicada (Cooper Institute / ACSM's Guidelines
-// for Exercise Testing and Prescription). Mantém os mesmos 5
-// rótulos usados no restante do SAFE pros testes de desempenho
-// (Fraco/Razoável/Bom/Muito Bom/Excelência), pra consistência
-// visual — os VALORES de corte, porém, são de uma fonte adulta
-// genérica, digitados de memória.
-//
-// ATENÇÃO — PROVISÓRIO: confira estes números contra uma fonte
-// oficial (ex: edição específica do ACSM's Guidelines) antes de
-// liberar pra avaliações reais de funcionários. Diferente da
-// tabela de crianças (PROESP-Br, conferida contra o manual
-// oficial), esta ainda não foi validada contra uma fonte
-// primária — trocar os valores abaixo se você tiver uma tabela
-// de referência própria.
-// ======================================================
+export function classificarIMCOMS(imc){
 
-const ACSM_VO2MAX = {
+    if(imc < 18.5){
 
-    masculino: {
-
-        29: { fraco:33, razoavel:37, bom:42, muitoBom:46 },
-        39: { fraco:31, razoavel:36, bom:41, muitoBom:45 },
-        49: { fraco:28, razoavel:32, bom:36, muitoBom:41 },
-        59: { fraco:25, razoavel:29, bom:33, muitoBom:37 },
-        99: { fraco:21, razoavel:25, bom:29, muitoBom:33 }
-
-    },
-
-    feminino: {
-
-        29: { fraco:28, razoavel:31, bom:34, muitoBom:38 },
-        39: { fraco:27, razoavel:30, bom:33, muitoBom:37 },
-        49: { fraco:25, razoavel:28, bom:31, muitoBom:34 },
-        59: { fraco:21, razoavel:24, bom:27, muitoBom:32 },
-        99: { fraco:18, razoavel:21, bom:24, muitoBom:28 }
+        return "Baixo peso";
 
     }
 
-};
+    if(imc < 25){
 
-export function classificarACSM(vo2max, idade, sexo){
-
-    if(vo2max === null || vo2max === undefined || isNaN(vo2max)){
-
-        return null;
+        return "Eutrófico";
 
     }
 
-    const chaveSexo = (sexo || "").toLowerCase() === "feminino" ? "feminino" : "masculino";
+    if(imc < 30){
 
-    const idadeValida = typeof idade === "number" ? Math.max(idade, 20) : 30;
-
-    const faixasEtarias = Object.keys(ACSM_VO2MAX[chaveSexo]).map(Number).sort((a,b) => a-b);
-
-    const faixaEtaria = faixasEtarias.find(limite => idadeValida <= limite) ?? faixasEtarias[faixasEtarias.length - 1];
-
-    const corte = ACSM_VO2MAX[chaveSexo][faixaEtaria];
-
-    if(vo2max <= corte.fraco){
-
-        return "Fraco";
+        return "Sobrepeso";
 
     }
 
-    if(vo2max <= corte.razoavel){
+    if(imc < 35){
 
-        return "Razoável";
-
-    }
-
-    if(vo2max <= corte.bom){
-
-        return "Bom";
+        return "Obesidade I";
 
     }
 
-    if(vo2max <= corte.muitoBom){
+    if(imc < 40){
 
-        return "Muito Bom";
+        return "Obesidade II";
 
     }
 
-    return "Excelência";
+    return "Obesidade III";
 
 }
 
 // ======================================================
-// CÁLCULO DO TESTE DE LÉGER
+// % DE GORDURA — protocolo de Petroski (1995), 4 dobras
+// cutâneas (subescapular, tríceps, supra-ilíaca, panturrilha
+// medial), convertendo densidade corporal em % de gordura
+// pela equação de Siri (1961).
+//
+// ATENÇÃO — PROVISÓRIO: os coeficientes abaixo foram
+// digitados de memória (sem acesso à publicação original no
+// momento da implementação). Confira contra Petroski, E.L.
+// "Desenvolvimento e validação de equações generalizadas para
+// a estimativa da densidade corporal em adultos" (1995) — ou
+// outra fonte confiável — antes de usar em avaliações reais.
 // ======================================================
 
-export function calcularResultadoLeger(estagioCompleto, voltaNoProximo, idade){
+export function calcularPercentualGorduraPetroski(dobras, idade, sexo){
 
-    const infoEstagio = ESTAGIOS_LEGER[estagioCompleto];
+    const { subescapular, triceps, suprailiaca, panturrilha } = dobras;
 
-    if(!infoEstagio){
+    const somaDobras = subescapular + triceps + suprailiaca + panturrilha;
 
-        return null;
+    let densidadeCorporal;
 
-    }
+    if((sexo || "").toLowerCase() === "feminino"){
 
-    // Tempo total: soma a duração de cada estágio já completado
-    // por inteiro, mais o tempo parcial das voltas no estágio seguinte
-    let tempoSegundos = 0;
+        densidadeCorporal = 1.19911426 - (0.07545822 * Math.log10(somaDobras)) - (0.00088780 * idade);
 
-    for(let n = 1; n <= estagioCompleto; n++){
+    }else{
 
-        const info = ESTAGIOS_LEGER[n];
-
-        const velocidadeMs = info.velocidade / 3.6;
-
-        const duracaoPorVolta = 20 / velocidadeMs;
-
-        tempoSegundos += info.voltas * duracaoPorVolta;
+        densidadeCorporal = 1.10726863 - (0.00081201 * somaDobras) + (0.00000212 * somaDobras * somaDobras) - (0.00041761 * idade);
 
     }
 
-    const proximoEstagio = ESTAGIOS_LEGER[estagioCompleto + 1];
-
-    if(voltaNoProximo > 0 && proximoEstagio){
-
-        const velocidadeMsProx = proximoEstagio.velocidade / 3.6;
-
-        const duracaoPorVoltaProx = 20 / velocidadeMsProx;
-
-        tempoSegundos += voltaNoProximo * duracaoPorVoltaProx;
-
-    }
-
-    const distanciaM = (infoEstagio.acumulado + voltaNoProximo) * 20;
-
-    // VO2máx (Léger, Mercier, Gadoury & Lambert, 1988)
-    const V = infoEstagio.velocidade;
-
-    const A = idade;
-
-    const vo2max = 31.025 + (3.238 * V) - (3.248 * A) + (0.1536 * A * V);
+    // Siri (1961): %G = (495 / densidade) - 450
+    const percentualGordura = (495 / densidadeCorporal) - 450;
 
     return {
 
-        velocidade: V,
-
-        distanciaM,
-
-        tempoSegundos: Math.round(tempoSegundos),
-
-        vo2max: Number(vo2max.toFixed(1))
+        somaDobras: Number(somaDobras.toFixed(1)),
+        densidadeCorporal: Number(densidadeCorporal.toFixed(5)),
+        percentualGordura: Number(percentualGordura.toFixed(1))
 
     };
 
 }
 
-// Converte um total de voltas acumuladas (o que o avaliador consegue
-// contar sozinho) no par [estagio completo, voltas no estágio
-// seguinte] que o resto do cálculo espera.
-export function converterVoltasParaEstagio(totalVoltas){
-
-    let estagioCompleto = 0;
-
-    let voltasRestantes = totalVoltas;
-
-    for(let n = 1; n < ESTAGIOS_LEGER.length; n++){
-
-        const info = ESTAGIOS_LEGER[n];
-
-        if(voltasRestantes >= info.voltas && info.acumulado <= totalVoltas){
-
-            estagioCompleto = n;
-
-            voltasRestantes = totalVoltas - info.acumulado;
-
-        }else{
-
-            break;
-
-        }
-
-    }
-
-    return { estagioCompleto, voltaNoProximo: Math.max(voltasRestantes, 0) };
-
-}
-
-// Valor mínimo pra completar o 1º estágio, e o total confirmado na
-// tabela (estágio 17) — usados na validação inteligente da tela.
-const VOLTAS_MINIMAS = ESTAGIOS_LEGER[1].voltas;
-
-const VOLTAS_MAXIMAS_CONFIRMADAS = ESTAGIOS_LEGER[ESTAGIOS_LEGER.length - 1].acumulado;
-
 // ======================================================
 // TELA DE COLETA EM CAMPO
-// Diferente dos módulos de aluno, aqui não existe "turma" —
-// o grid carrega direto todos os funcionários ativos da
-// escola. Só se pede o TOTAL DE VOLTAS (o que dá pra contar
-// durante a aplicação) — o sistema calcula estágio, tempo,
-// distância e VO₂máx sozinho.
+// Mesmo padrão dos outros testes (grid de cards), mas sem
+// turma — carrega direto todos os funcionários ativos da
+// escola, igual ao Léger adulto.
 // ======================================================
 
 let dadosFuncionarios = [];
@@ -277,7 +143,7 @@ let filtroAtual = "todos";
 
 let termoBusca = "";
 
-let gridFuncionariosLG, buscaFuncionarioLG, filtrosSituacaoLG;
+let gridFuncionariosAA, buscaFuncionarioAA, filtrosSituacaoAA;
 let areaProgresso, areaFiltros;
 let progressoContagem, progressoPreenchimento;
 let qtdConcluidos, qtdPendentes, qtdAusentes;
@@ -286,9 +152,9 @@ let btnFuncionarioAnterior, btnProximoFuncionario;
 
 function obterElementos(){
 
-    gridFuncionariosLG = document.getElementById("gridFuncionariosLG");
-    buscaFuncionarioLG = document.getElementById("buscaFuncionarioLG");
-    filtrosSituacaoLG = document.getElementById("filtrosSituacaoLG");
+    gridFuncionariosAA = document.getElementById("gridFuncionariosAA");
+    buscaFuncionarioAA = document.getElementById("buscaFuncionarioAA");
+    filtrosSituacaoAA = document.getElementById("filtrosSituacaoAA");
     areaProgresso = document.getElementById("areaProgresso");
     areaFiltros = document.getElementById("areaFiltros");
     progressoContagem = document.getElementById("progressoContagem");
@@ -306,19 +172,19 @@ function obterElementos(){
 
 function configurarEventos(){
 
-    buscaFuncionarioLG.addEventListener("keyup", () => {
+    buscaFuncionarioAA.addEventListener("keyup", () => {
 
-        termoBusca = buscaFuncionarioLG.value.trim().toLowerCase();
+        termoBusca = buscaFuncionarioAA.value.trim().toLowerCase();
 
         renderizarGrid();
 
     });
 
-    filtrosSituacaoLG.querySelectorAll(".filtro-situacao").forEach(botao=>{
+    filtrosSituacaoAA.querySelectorAll(".filtro-situacao").forEach(botao=>{
 
         botao.addEventListener("click", () => {
 
-            filtrosSituacaoLG.querySelectorAll(".filtro-situacao").forEach(b => b.classList.remove("ativo"));
+            filtrosSituacaoAA.querySelectorAll(".filtro-situacao").forEach(b => b.classList.remove("ativo"));
 
             botao.classList.add("ativo");
 
@@ -336,33 +202,13 @@ function configurarEventos(){
 
     document.getElementById("btnComoExecutar").addEventListener("click", () => {
 
-        window.abrirComoExecutar("leger");
+        window.abrirComoExecutar("antropometriaAdulto");
 
     });
 
     document.getElementById("fecharHistoricoLateral").addEventListener("click", fecharHistoricoLateral);
 
     document.getElementById("fundoPainelLateral").addEventListener("click", fecharHistoricoLateral);
-
-    document.getElementById("btnCancelarValidacaoLG").addEventListener("click", () => {
-
-        document.getElementById("modalValidacaoLG").classList.remove("show");
-
-    });
-
-    document.getElementById("btnConfirmarValidacaoLG").addEventListener("click", () => {
-
-        document.getElementById("modalValidacaoLG").classList.remove("show");
-
-        if(funcionarioPendenteDeConfirmacao){
-
-            salvarResultado(funcionarioPendenteDeConfirmacao, true);
-
-            funcionarioPendenteDeConfirmacao = null;
-
-        }
-
-    });
 
 }
 
@@ -378,7 +224,7 @@ export async function init(){
 
     if(containerIconeTeste){
 
-        containerIconeTeste.innerHTML = iconeTeste("leger", 56);
+        containerIconeTeste.innerHTML = iconeTeste("antropometriaAdulto", 56);
 
     }
 
@@ -410,7 +256,7 @@ async function carregarFuncionarios(){
 
     dadosFuncionarios = [];
 
-    gridFuncionariosLG.innerHTML = `<p style="color:#94a3b8; grid-column:1/-1;">Carregando funcionários...</p>`;
+    gridFuncionariosAA.innerHTML = `<p style="color:#94a3b8; grid-column:1/-1;">Carregando funcionários...</p>`;
 
     areaProgresso.style.display = "none";
 
@@ -420,7 +266,7 @@ async function carregarFuncionarios(){
 
         const condicoesFuncionarios = filtroEscola();
 
-        const qFuncionarios = query(collection(db,"funcionarios"), ...condicoesFuncionarios, orderBy("nome"));
+        const qFuncionarios = query(collection(db,"funcionarios"), ...condicoesFuncionarios);
 
         const snapFuncionarios = await getDocs(qFuncionarios);
 
@@ -438,9 +284,11 @@ async function carregarFuncionarios(){
 
         });
 
+        funcionariosAtivos.sort((a,b) => (a.nome || "").localeCompare(b.nome || "", "pt-BR"));
+
         const condicoesAvaliacoes = filtroEscola();
 
-        const qAvaliacoes = query(collection(db,"avaliacoes_leger_adulto"), ...condicoesAvaliacoes);
+        const qAvaliacoes = query(collection(db,"avaliacoes_antropometria_adulto"), ...condicoesAvaliacoes);
 
         const snapAvaliacoes = await getDocs(qAvaliacoes);
 
@@ -485,9 +333,7 @@ async function carregarFuncionarios(){
             return {
 
                 funcionario,
-                ultimoValor: maisRecente?.voltasTotais ?? null,
-                ultimoVo2max: maisRecente?.vo2max ?? null,
-                ultimaClassificacao: maisRecente?.classificacao ?? null,
+                ultimoRegistro: maisRecente,
                 avaliadoHoje: dataMaisRecenteISO === hojeISO,
                 ausente: false
 
@@ -561,9 +407,7 @@ function obterListaFiltrada(){
 
     }else if(filtroAtual === "risco"){
 
-        // Sem "zona de saúde" pra adultos aqui — usa a classificação
-        // "Fraco" (tier mais baixo do ACSM) como equivalente de alerta.
-        lista = lista.filter(d => d.ultimaClassificacao === "Fraco");
+        lista = lista.filter(d => d.ultimoRegistro?.classificacaoIMC?.startsWith("Obesidade") || d.ultimoRegistro?.classificacaoRCE === "Zona de risco à saúde");
 
     }
 
@@ -579,13 +423,13 @@ function renderizarGrid(){
 
     if(lista.length === 0){
 
-        gridFuncionariosLG.innerHTML = `<p style="color:#94a3b8; grid-column:1/-1;">Nenhum funcionário encontrado com esse filtro.</p>`;
+        gridFuncionariosAA.innerHTML = `<p style="color:#94a3b8; grid-column:1/-1;">Nenhum funcionário encontrado com esse filtro.</p>`;
 
         return;
 
     }
 
-    gridFuncionariosLG.innerHTML = lista.map(dadosFuncionario => renderizarCard(dadosFuncionario)).join("");
+    gridFuncionariosAA.innerHTML = lista.map(dadosFuncionario => renderizarCard(dadosFuncionario)).join("");
 
     lista.forEach(dadosFuncionario=>{
 
@@ -599,16 +443,6 @@ function renderizarGrid(){
 
         card.querySelector(".btn-salvar-card")?.addEventListener("click", () => salvarResultado(idFuncionario));
 
-        card.querySelector(".input-resultado")?.addEventListener("keyup", (evento)=>{
-
-            if(evento.key === "Enter"){
-
-                salvarResultado(idFuncionario);
-
-            }
-
-        });
-
         card.querySelector(".btn-ausente-card")?.addEventListener("click", () => alternarAusente(idFuncionario));
 
         card.querySelector(".card-aluno-nome")?.addEventListener("click", () => abrirHistoricoLateral(idFuncionario));
@@ -619,7 +453,7 @@ function renderizarGrid(){
 
 function renderizarCard(dadosFuncionario){
 
-    const { funcionario, ultimoValor, ultimoVo2max, ultimaClassificacao, avaliadoHoje, ausente } = dadosFuncionario;
+    const { funcionario, ultimoRegistro, avaliadoHoje, ausente } = dadosFuncionario;
 
     const idade = calcularIdade(funcionario.dataNascimento);
 
@@ -635,9 +469,9 @@ function renderizarCard(dadosFuncionario){
 
     }
 
-    const ultimoResultadoTexto = ultimoValor !== null
+    const ultimoResultadoTexto = ultimoRegistro
 
-        ? `${ultimoValor} voltas — VO₂ ${ultimoVo2max ?? "-"}${ultimaClassificacao ? " — " + ultimaClassificacao : ""}`
+        ? `IMC ${ultimoRegistro.imc ?? "-"} (${ultimoRegistro.classificacaoIMC ?? "-"}) • RCE ${ultimoRegistro.rce ?? "-"} • Gordura ${ultimoRegistro.percentualGordura ?? "-"}%`
 
         : "Sem registro anterior";
 
@@ -658,15 +492,15 @@ function renderizarCard(dadosFuncionario){
 
             ${!ausente ? `
 
-                <div class="card-aluno-entrada">
+                <div class="card-aluno-entrada campos-antropometria-adulto">
 
-                    <input
-                        type="number"
-                        step="1"
-                        min="0"
-                        class="form-control input-resultado"
-                        placeholder="total de voltas"
-                        aria-label="Resultado de ${funcionario.nome}">
+                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-peso" placeholder="peso (kg)" aria-label="Peso de ${funcionario.nome}">
+                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-estatura" placeholder="estatura (cm)" aria-label="Estatura de ${funcionario.nome}">
+                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-cintura" placeholder="cintura (cm)" aria-label="Cintura de ${funcionario.nome}">
+                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-subescapular" placeholder="dobra subescapular (mm)" aria-label="Dobra subescapular de ${funcionario.nome}">
+                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-triceps" placeholder="dobra tríceps (mm)" aria-label="Dobra tríceps de ${funcionario.nome}">
+                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-suprailiaca" placeholder="dobra supra-ilíaca (mm)" aria-label="Dobra supra-ilíaca de ${funcionario.nome}">
+                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-panturrilha" placeholder="dobra panturrilha (mm)" aria-label="Dobra panturrilha de ${funcionario.nome}">
 
                     <button class="btn btn-primary btn-salvar-card">Salvar</button>
 
@@ -702,9 +536,7 @@ function alternarAusente(funcionarioId){
 
 }
 
-let funcionarioPendenteDeConfirmacao = null;
-
-async function salvarResultado(funcionarioId, forcarSemValidar = false){
+async function salvarResultado(funcionarioId){
 
     const dadosFuncionario = dadosFuncionarios.find(d => d.funcionario.id === funcionarioId);
 
@@ -714,23 +546,41 @@ async function salvarResultado(funcionarioId, forcarSemValidar = false){
 
     const card = document.getElementById(`card-${funcionarioId}`);
 
-    const input = card?.querySelector(".input-resultado");
+    const campos = {
 
-    if(!input || input.value === ""){
+        peso: card?.querySelector(".input-peso"),
+        estatura: card?.querySelector(".input-estatura"),
+        cintura: card?.querySelector(".input-cintura"),
+        subescapular: card?.querySelector(".input-subescapular"),
+        triceps: card?.querySelector(".input-triceps"),
+        suprailiaca: card?.querySelector(".input-suprailiaca"),
+        panturrilha: card?.querySelector(".input-panturrilha")
 
-        mostrarToast("Informe o total de voltas antes de salvar.", "erro");
+    };
+
+    const algumVazio = Object.values(campos).some(input => !input || input.value === "");
+
+    if(algumVazio){
+
+        mostrarToast("Preencha todos os campos antes de salvar.", "erro");
 
         return;
 
     }
 
-    const totalVoltas = Number(input.value);
+    const valores = {};
 
-    if(isNaN(totalVoltas) || totalVoltas < VOLTAS_MINIMAS){
+    for(const chave in campos){
 
-        mostrarToast(`Informe pelo menos ${VOLTAS_MINIMAS} voltas (mínimo pra completar o primeiro estágio).`, "erro");
+        valores[chave] = Number(campos[chave].value);
 
-        return;
+        if(isNaN(valores[chave]) || valores[chave] <= 0){
+
+            mostrarToast("Valores inválidos.", "erro");
+
+            return;
+
+        }
 
     }
 
@@ -738,34 +588,30 @@ async function salvarResultado(funcionarioId, forcarSemValidar = false){
 
     if(typeof idade !== "number"){
 
-        mostrarToast("Funcionário sem data de nascimento cadastrada — não é possível calcular o VO₂máx.", "erro");
+        mostrarToast("Funcionário sem data de nascimento cadastrada — não é possível calcular a composição corporal.", "erro");
 
         return;
 
     }
 
-    // Validação inteligente: além da tabela de estágios confirmada
-    if(!forcarSemValidar && totalVoltas > VOLTAS_MAXIMAS_CONFIRMADAS){
+    const sexo = dadosFuncionario.funcionario.sexo;
 
-        abrirModalValidacao(totalVoltas, funcionarioId);
+    const imc = Number(calcularIMCAdulto(valores.peso, valores.estatura).toFixed(1));
 
-        return;
+    const classificacaoIMC = classificarIMCOMS(imc);
 
-    }
+    const rce = Number(calcularRCE(valores.cintura, valores.estatura).toFixed(2));
 
-    const { estagioCompleto, voltaNoProximo } = converterVoltasParaEstagio(totalVoltas);
+    const classificacaoRCE = classificarRCEAdulto(rce);
 
-    const resultado = calcularResultadoLeger(estagioCompleto, voltaNoProximo, idade);
+    const { somaDobras, densidadeCorporal, percentualGordura } = calcularPercentualGorduraPetroski({
 
-    if(!resultado){
+        subescapular: valores.subescapular,
+        triceps: valores.triceps,
+        suprailiaca: valores.suprailiaca,
+        panturrilha: valores.panturrilha
 
-        mostrarToast("Não foi possível calcular o resultado.", "erro");
-
-        return;
-
-    }
-
-    const classificacao = classificarACSM(resultado.vo2max, idade, dadosFuncionario.funcionario.sexo);
+    }, idade, sexo);
 
     const contexto = obterContextoUsuario();
 
@@ -778,15 +624,20 @@ async function salvarResultado(funcionarioId, forcarSemValidar = false){
             ? (dadosFuncionario.funcionario.escolaId || "")
             : obterEscolaId(),
         avaliadorId: contexto.uid,
-        estagio: estagioCompleto,
-        volta: voltaNoProximo,
-        voltasTotais: totalVoltas,
-        velocidadeFinal: resultado.velocidade,
-        distanciaM: resultado.distanciaM,
-        tempoSegundos: resultado.tempoSegundos,
-        vo2max: resultado.vo2max,
-        classificacao,
-        observacoes: "",
+        peso: valores.peso,
+        estatura: valores.estatura,
+        imc,
+        classificacaoIMC,
+        cintura: valores.cintura,
+        rce,
+        classificacaoRCE,
+        dobraSubescapular: valores.subescapular,
+        dobraTriceps: valores.triceps,
+        dobraSuprailiaca: valores.suprailiaca,
+        dobraPanturrilha: valores.panturrilha,
+        somaDobras,
+        densidadeCorporal,
+        percentualGordura,
         dataTeste: Timestamp.now(),
         criadoEm: Timestamp.now()
 
@@ -794,17 +645,13 @@ async function salvarResultado(funcionarioId, forcarSemValidar = false){
 
     try{
 
-        await addDoc(collection(db,"avaliacoes_leger_adulto"), avaliacao);
+        await addDoc(collection(db,"avaliacoes_antropometria_adulto"), avaliacao);
 
-        dadosFuncionario.ultimoValor = totalVoltas;
-
-        dadosFuncionario.ultimoVo2max = resultado.vo2max;
-
-        dadosFuncionario.ultimaClassificacao = classificacao;
+        dadosFuncionario.ultimoRegistro = avaliacao;
 
         dadosFuncionario.avaliadoHoje = true;
 
-        mostrarToast(`${dadosFuncionario.funcionario.nome}: Estágio ${estagioCompleto} salvo!`);
+        mostrarToast(`${dadosFuncionario.funcionario.nome}: avaliação salva!`);
 
         renderizarProgresso();
 
@@ -822,18 +669,6 @@ async function salvarResultado(funcionarioId, forcarSemValidar = false){
 
 }
 
-function abrirModalValidacao(valor, funcionarioId){
-
-    funcionarioPendenteDeConfirmacao = funcionarioId;
-
-    document.getElementById("mensagemValidacaoLG").textContent =
-
-        `${valor} voltas passa do estágio 17, que é o limite confirmado da nossa tabela. Confira se contou certo antes de confirmar.`;
-
-    document.getElementById("modalValidacaoLG").classList.add("show");
-
-}
-
 function focarProximoPendente(funcionarioIdAtual){
 
     const lista = obterListaFiltrada();
@@ -844,11 +679,11 @@ function focarProximoPendente(funcionarioIdAtual){
 
     if(proximoPendente){
 
-        const proximoInput = document.getElementById(`card-${proximoPendente.funcionario.id}`)?.querySelector(".input-resultado");
+        const proximoCard = document.getElementById(`card-${proximoPendente.funcionario.id}`);
 
-        proximoInput?.scrollIntoView({ behavior:"smooth", block:"center" });
+        proximoCard?.scrollIntoView({ behavior:"smooth", block:"center" });
 
-        proximoInput?.focus();
+        proximoCard?.querySelector(".input-peso")?.focus();
 
     }
 
@@ -878,11 +713,11 @@ function moverFoco(direcao){
         proximoIndice = lista.length - 1;
     }
 
-    const alvo = document.getElementById(`card-${lista[proximoIndice].funcionario.id}`)?.querySelector(".input-resultado");
+    const alvoCard = document.getElementById(`card-${lista[proximoIndice].funcionario.id}`);
 
-    alvo?.scrollIntoView({ behavior:"smooth", block:"center" });
+    alvoCard?.scrollIntoView({ behavior:"smooth", block:"center" });
 
-    alvo?.focus();
+    alvoCard?.querySelector(".input-peso")?.focus();
 
 }
 
@@ -908,7 +743,7 @@ async function abrirHistoricoLateral(funcionarioId){
 
         const condicoes = filtroEscola();
 
-        const q = query(collection(db,"avaliacoes_leger_adulto"), ...condicoes);
+        const q = query(collection(db,"avaliacoes_antropometria_adulto"), ...condicoes);
 
         const snapshot = await getDocs(q);
 
@@ -952,8 +787,8 @@ async function abrirHistoricoLateral(funcionarioId){
 
                 <div class="linha-historico-lateral">
                     <div class="linha-historico-lateral-data">${data}</div>
-                    <div class="linha-historico-lateral-valor">Estágio ${av.estagio ?? "-"} — VO₂ ${av.vo2max ?? "-"}</div>
-                    <div class="linha-historico-lateral-classificacao">${av.classificacao ?? "-"}</div>
+                    <div class="linha-historico-lateral-valor">IMC ${av.imc ?? "-"} (${av.classificacaoIMC ?? "-"}) • RCE ${av.rce ?? "-"} (${av.classificacaoRCE ?? "-"})</div>
+                    <div class="linha-historico-lateral-classificacao">Gordura corporal: ${av.percentualGordura ?? "-"}%</div>
                 </div>
 
             `;

@@ -32,12 +32,9 @@ from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 const CATEGORIAS_DESEMPENHO = ["Fraco","Razoável","Bom","Muito Bom","Excelência"];
 
-const CATEGORIAS_LEGER = ["Zona de risco à saúde","Precisa melhorar","Zona saudável"];
-
 const CATEGORIAS_IMC = ["Zona de risco à saúde","Zona saudável"];
 
 const TESTES_CONFIG = [
-    { colecao:"avaliacoes_leger", titulo:"Léger", campo:"classificacao", categorias:CATEGORIAS_LEGER },
     { colecao:"avaliacoes_circunferenciacintura", titulo:"Perímetro da Cintura (RCE)", campo:"classificacaoSaude", categorias:CATEGORIAS_IMC },
     { colecao:"avaliacoes_imc", titulo:"IMC", campo:"classificacaoSaude", categorias:CATEGORIAS_IMC },
     { colecao:"avaliacoes_flexibilidade", titulo:"Flexibilidade", campo:"classificacaoDesempenho", categorias:CATEGORIAS_DESEMPENHO },

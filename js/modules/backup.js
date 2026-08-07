@@ -21,12 +21,6 @@ from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 const TESTES_CONFIG = [
 
-    { colecao:"avaliacoes_leger", titulo:"Léger", colunas:[
-        {label:"Estágio", campo:"estagio"},
-        {label:"VO₂máx", campo:"vo2max"},
-        {label:"Classificação", campo:"classificacao"}
-    ]},
-
     { colecao:"avaliacoes_circunferenciacintura", titulo:"Perímetro da Cintura (RCE)", colunas:[
         {label:"Cintura (cm)", campo:"cintura"},
         {label:"Estatura (cm)", campo:"estatura"},

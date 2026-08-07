@@ -1,0 +1,244 @@
+<div class="page">
+
+    <div class="page-header">
+
+        <div>
+
+            <div class="page-title">
+
+                Cadastro de Funcionários
+
+            </div>
+
+            <div class="page-subtitle">
+
+                Colaboradores da escola avaliados separadamente da bateria PROESP-Br (professores, motoristas, zeladores etc.).
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="toolbar">
+
+    <button
+        id="btnNovoFuncionario"
+        class="btn btn-primary">
+
+        Novo Funcionário
+
+    </button>
+
+</div>
+
+    <div class="card">
+    <input
+        type="text"
+        id="pesquisaFuncionario"
+        class="input-search"
+        placeholder="Pesquisar funcionário...">
+
+</div>
+
+<table class="safe-table">
+
+    <thead>
+
+        <th onclick="ordenarTabelaFuncionarios('nome')" class="sortable">
+
+    Nome
+
+</th>
+
+<th onclick="ordenarTabelaFuncionarios('cargo')" class="sortable">
+
+    Cargo
+
+</th>
+
+<th>
+
+    Idade
+
+</th>
+
+<th>
+
+    Situação
+
+</th>
+
+<th>
+
+    Ações
+
+</th>
+
+    </thead>
+
+    <tbody id="listaFuncionarios">
+
+        <tr>
+
+            <td colspan="5" style="text-align:center">
+
+                Nenhum funcionário cadastrado.
+
+            </td>
+
+        </tr>
+
+    </tbody>
+
+</table>
+
+<!-- ==========================================
+     PAGINAÇÃO
+========================================== -->
+
+<div class="paginacao">
+
+    <button id="paginaAnteriorFuncionario" class="btn-secundario">
+
+        ◄ Anterior
+
+    </button>
+
+    <span id="infoPaginaFuncionario">
+
+        Página 1 de 1
+
+    </span>
+
+    <button id="paginaProximaFuncionario" class="btn-secundario">
+
+        Próxima ►
+
+    </button>
+
+</div>
+
+<!-- MODAL -->
+
+<div class="modal" id="modalFuncionario">
+
+    <div class="modal-content">
+
+        <h2 id="tituloModalFuncionario">Novo Funcionário</h2>
+        <input type="hidden" id="funcionarioId">
+
+        <br>
+
+        <div class="form-group" id="grupoEscolaFuncionario" style="display:none">
+
+            <label>Escola</label>
+
+            <select
+                id="escolaFuncionario"
+                class="form-control">
+
+                <option value="">Selecione...</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Nome completo</label>
+
+            <input
+                id="nomeFuncionario"
+                class="form-control">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Cargo</label>
+
+            <select
+                id="cargoFuncionario"
+                class="form-control">
+
+                <option value="Professor">Professor</option>
+                <option value="Motorista">Motorista</option>
+                <option value="Zelador">Zelador(a)</option>
+                <option value="Merendeira">Merendeira</option>
+                <option value="Outro">Outro</option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Data de nascimento</label>
+
+            <input
+                id="nascimentoFuncionario"
+                type="date"
+                class="form-control">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Sexo</label>
+
+            <select
+                id="sexoFuncionario"
+                class="form-control">
+
+                <option value="Masculino">Masculino</option>
+                <option value="Feminino">Feminino</option>
+
+            </select>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button
+                class="btn btn-secondary"
+                id="cancelarFuncionario">
+
+                Cancelar
+
+            </button>
+
+            <button
+                class="btn btn-success"
+                id="salvarFuncionario">
+
+                Salvar
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- =============================================
+TOAST
+============================================= -->
+
+<div id="toast" class="toast"></div>
+
+<!-- =============================================
+LOADER
+============================================= -->
+
+<div id="loader" class="loader">
+
+    <div class="loader-box">
+
+        <div class="spinner"></div>
+
+        <p>Salvando informações...</p>
+
+    </div>
+
+</div>
+</div>

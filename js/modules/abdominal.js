@@ -14,12 +14,11 @@ import {
     obterEscolaId,
     souSuperAdmin,
     obterContextoUsuario,
-    mostrarToast
+    mostrarToast,
+    calcularIdade
 } from "../core/utils.js";
 
 import { iconeTeste, iniciarPopupTestes, iniciarModalComoExecutar } from "../core/testeInfoUI.js";
-
-import { calcularIdade } from "./leger.js";
 
 import{
     collection,

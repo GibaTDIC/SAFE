@@ -18,7 +18,6 @@ from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 // atividades recentes sem repetir a lista em cada função.
 const TESTES_CONFIG = [
     { colecao:"avaliacoes_circunferenciacintura", titulo:"Perímetro da Cintura" },
-    { colecao:"avaliacoes_leger", titulo:"Léger" },
     { colecao:"avaliacoes_imc", titulo:"IMC" },
     { colecao:"avaliacoes_flexibilidade", titulo:"Flexibilidade" },
     { colecao:"avaliacoes_abdominal", titulo:"Resistência Muscular" },

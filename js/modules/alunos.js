@@ -38,12 +38,7 @@ import {
 }
 from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-import {
-    calcularResultadoLeger,
-    calcularIdade,
-    classificarFitnessgram,
-    converterVoltasParaEstagio
-} from "./leger.js";
+import { calcularIdade } from "../core/utils.js";
 
 import { iconeTeste } from "../core/testeInfoUI.js";
 
@@ -85,54 +80,11 @@ let horarioAutenticacao = null;
 // ======================================================
 
 const CATEGORIAS_DESEMPENHO = ["Fraco","Razoável","Bom","Muito Bom","Excelência"];
-const CATEGORIAS_LEGER = ["Zona de risco à saúde","Precisa melhorar","Zona saudável"];
 const CATEGORIAS_IMC = ["Zona de risco à saúde","Zona saudável"];
 
+// Léger não faz parte da bateria do aluno — é aplicado separadamente
+// aos funcionários adultos da escola (ver js/modules/funcionarioPortal.js).
 const TESTES_CONFIG = {
-
-    leger: {
-
-        titulo: "Léger",
-        colecao: "avaliacoes_leger",
-        capacidade: "Resistência Cardiorrespiratória",
-        tempoEstimado: "~10 min",
-        campos: [
-            { id:"voltasTotais", label:"Total de voltas concluídas", tipo:"number", min:"0", passo:"1", unidade:"voltas" }
-        ],
-        campoPosicao: "classificacao",
-        categoriasPosicao: CATEGORIAS_LEGER,
-        campoValorPrincipal: "vo2max",
-        mostrarEsforcoSensacao: true,
-        calcular(valores, idade, sexo){
-
-            const totalVoltas = Number(valores.voltasTotais);
-
-            const { estagioCompleto, voltaNoProximo } = converterVoltasParaEstagio(totalVoltas);
-
-            const resultado = calcularResultadoLeger(estagioCompleto, voltaNoProximo, idade);
-
-            if(!resultado){
-                return null;
-            }
-
-            return {
-                estagio: estagioCompleto,
-                volta: voltaNoProximo,
-                velocidadeFinal: resultado.velocidade,
-                distanciaM: resultado.distanciaM,
-                tempoSegundos: resultado.tempoSegundos,
-                vo2max: resultado.vo2max,
-                classificacao: classificarFitnessgram(resultado.vo2max, idade, sexo)
-            };
-
-        },
-        colunas: [
-            { label:"Estágio", campo:"estagio" },
-            { label:"VO₂máx", campo:"vo2max" },
-            { label:"Classificação", campo:"classificacao" }
-        ]
-
-    },
 
     circunferenciacintura: {
 

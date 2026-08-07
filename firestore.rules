@@ -1,0 +1,335 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null;
+    }
+
+    function meuPapel() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.papel;
+    }
+
+
+    function minhasEscolas() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.escolaIds;
+    }
+
+    // Admin global do sistema (vê e gerencia todas as escolas)
+    function souSuperAdmin() {
+      return logado() && meuPapel() == 'super_admin';
+    }
+
+    // Admin local de uma escola específica (coordenador)
+    function souAdminEscola(escolaId) {
+      return logado() && meuPapel() == 'admin_escola' && minhasEscolas().hasAny([escolaId]);
+    }
+
+    // Qualquer usuário (professor, admin_escola ou super_admin) vinculado a essa escola
+    function souDaEscola(escolaId) {
+      return logado() && minhasEscolas().hasAny([escolaId]);
+    }
+
+    // Sessão anônima do portal do aluno (aluno.html) ou do portal do
+    // funcionário (funcionario.html) — sem login de professor/admin.
+    // Usada só pra ler nomes de escola/turma/aluno/funcionário e criar
+    // uma avaliação autopreenchida, nunca pra ler dados de outros
+    // usuários nem editar/apagar nada.
+    function souAnonimo() {
+      return logado() && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+
+    // Condição comum de criação de avaliação pelo próprio aluno (sem
+    // login): precisa ser sessão anônima, marcar origem == 'aluno', não
+    // ter professor associado, e ter os 3 vínculos básicos como texto.
+    function criacaoValidaPeloAluno() {
+      return souAnonimo() &&
+        request.resource.data.origem == 'aluno' &&
+        request.resource.data.professorId == null &&
+        request.resource.data.escolaId is string &&
+        request.resource.data.turmaId is string &&
+        request.resource.data.alunoId is string;
+    }
+
+    // Mesma coisa, mas pro portal do funcionário (adultos — professores,
+    // motoristas, zeladores etc.). Sem turmaId, já que funcionário não
+    // tem turma.
+    function criacaoValidaPeloFuncionario() {
+      return souAnonimo() &&
+        request.resource.data.origem == 'funcionario' &&
+        request.resource.data.avaliadorId == null &&
+        request.resource.data.escolaId is string &&
+        request.resource.data.funcionarioId is string;
+    }
+
+    // Pode ler/gerenciar dados de uma escola: super_admin sempre,
+    // ou qualquer usuário (professor/admin_escola) vinculado a ela
+    function podeAcessarEscola(escolaId) {
+      return souSuperAdmin() || souDaEscola(escolaId);
+    }
+
+    // Alguém marcado como "somente leitura" (restrição aplicada pelo
+    // admin_escola) continua lendo tudo normalmente, mas não escreve
+    // nada — nem criar, nem editar, nem excluir.
+    //
+    // IMPORTANTE: usa .get('somenteLeitura', false) em vez de
+    // .data.somenteLeitura direto. Como esse campo é novo, a maioria
+    // das contas ainda não tem ele — e ler um campo inexistente com
+    // ponto (.data.somenteLeitura) QUEBRA a regra inteira (erro, não
+    // null), fazendo a checagem falhar pra todo mundo, não só quem
+    // devia estar restrito. Com .get(chave, padrão), falta do campo
+    // vira "false" de verdade, sem quebrar nada.
+    function souSomenteLeitura() {
+      return get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.get('somenteLeitura', false) == true;
+    }
+
+    // Mesma coisa que podeAcessarEscola, mas pra escrita — nega se a
+    // pessoa estiver em modo somente leitura, mesmo sendo da escola.
+    function podeEscreverNaEscola(escolaId) {
+      return souSuperAdmin() || (souDaEscola(escolaId) && !souSomenteLeitura());
+    }
+
+    // Só quem administra a escola (não um professor comum) pode
+    // editar/excluir turma — professor só visualiza e cria.
+    function podeGerenciarTurma(escolaId) {
+      return souSuperAdmin() || (souAdminEscola(escolaId) && !souSomenteLeitura());
+    }
+
+    // ---------------------------------------------------
+    // USUARIOS
+    // Leitura: o próprio usuário, o super_admin, ou o
+    // admin_escola da mesma escola que ele.
+    // Escrita: super_admin gerencia qualquer um. admin_escola
+    // só cria/edita/remove PROFESSORES da própria escola —
+    // nunca outro admin_escola ou super_admin, e nunca muda a
+    // própria escola do registro (evita virar admin de outra escola).
+    // ---------------------------------------------------
+    match /usuarios/{uid} {
+
+      // Trava de integridade: um admin_escola NUNCA pode ter mais de uma
+      // escola vinculada — vale até pra super_admin, é regra de dado, não
+      // de permissão de quem está escrevendo.
+      function escolaIdsValidoParaOPapel(dados) {
+        return dados.papel != 'admin_escola' || dados.escolaIds.size() == 1;
+      }
+
+      // read: leitura básica (sem PIN, que fica isolado à parte) —
+      // qualquer admin_escola pode ver a lista de usuários, não só os
+      // da própria escola. Simplificado de propósito: uma condição
+      // muito específica aqui (comparando minhas escolas com as do
+      // usuário sendo lido) impede o Firestore de autorizar consultas
+      // em lista (ele não consegue provar a regra pra todos os
+      // resultados possíveis, e nega a busca inteira).
+      // Leitura básica (sem PIN, que fica isolado à parte) liberada pra
+      // qualquer usuário logado — mesmo padrão já usado em "escolas".
+      // Sem isso, um professor comum nem conseguiria ver a contagem de
+      // colegas no Dashboard (só quem é admin_escola/super_admin podia).
+      allow read: if logado();
+
+      // admin_escola só cria professor com escolaIds = exatamente [a própria escola dele]
+      // (nunca mais de uma escola, nunca escola de outro admin, nunca outro papel)
+      allow create: if escolaIdsValidoParaOPapel(request.resource.data) && (
+        souSuperAdmin() || (
+          meuPapel() == 'admin_escola' &&
+          !souSomenteLeitura() &&
+          request.resource.data.papel == 'professor' &&
+          request.resource.data.escolaIds.size() == 1 &&
+          minhasEscolas().hasAny(request.resource.data.escolaIds)
+        )
+      );
+
+      // admin_escola não pode mudar papel nem a lista de escolas do professor
+      // (só super_admin decide se um professor passa a atender mais escolas)
+      // admin_escola só pode editar nome e o modo "somente leitura" do
+      // professor — NUNCA ativo/desativo (isso é bloqueio total, só o
+      // super_admin decide), nem papel, nem a lista de escolas.
+      allow update: if escolaIdsValidoParaOPapel(request.resource.data) && (
+        souSuperAdmin() || (
+          meuPapel() == 'admin_escola' &&
+          !souSomenteLeitura() &&
+          resource.data.papel == 'professor' &&
+          request.resource.data.papel == 'professor' &&
+          request.resource.data.escolaIds == resource.data.escolaIds &&
+          request.resource.data.get('ativo', true) == resource.data.get('ativo', true) &&
+          minhasEscolas().hasAny(resource.data.escolaIds)
+        )
+      );
+
+      // Excluir usuário é bloqueio total — só o super_admin.
+      allow delete: if souSuperAdmin();
+
+      // PIN isolado: só o próprio dono lê. Escrita (definir/resetar PIN)
+      // segue a mesma hierarquia acima.
+      match /privado/{docId} {
+
+        allow read: if logado() && request.auth.uid == uid;
+
+        allow write: if souSuperAdmin() || (
+          meuPapel() == 'admin_escola' &&
+          !souSomenteLeitura() &&
+          minhasEscolas().hasAny(
+            get(/databases/$(database)/documents/usuarios/$(uid)).data.escolaIds
+          )
+        );
+      }
+    }
+
+    // ---------------------------------------------------
+    // ESCOLAS
+    // Criar/excluir: só super_admin. Editar dados da própria
+    // escola: super_admin ou o admin_escola daquela escola.
+    // ---------------------------------------------------
+    match /escolas/{escolaId} {
+      allow read: if logado(); // inclui souAnonimo(), já que é uma sessão logada (anônima)
+      allow create, delete: if souSuperAdmin();
+      allow update: if souSuperAdmin() || souAdminEscola(escolaId);
+    }
+
+    // ---------------------------------------------------
+    // TURMAS / ALUNOS
+    // Leitura também liberada pra sessão anônima do portal do aluno
+    // (precisa listar turmas/alunos pra montar os selects, sem login).
+    // ---------------------------------------------------
+    match /turmas/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId);
+      allow update, delete: if podeGerenciarTurma(resource.data.escolaId);
+    }
+
+    match /alunos/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId);
+    }
+
+    // ---------------------------------------------------
+    // FUNCIONÁRIOS (adultos da escola — professores, motoristas,
+    // zeladores etc.). Avaliados fora da bateria PROESP-Br, por
+    // isso ficam numa coleção própria, sem turma. Mesmo padrão de
+    // leitura/escrita de "alunos" — leitura também liberada pra
+    // sessão anônima do portal do funcionário (funcionario.html).
+    // ---------------------------------------------------
+    match /funcionarios/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId);
+    }
+
+    // ---------------------------------------------------
+    // AVALIAÇÕES (uma coleção por teste)
+    // Repetido por coleção porque o Firestore não permite
+    // wildcard no NOME da coleção (ex: avaliacoes_{tipo})
+    // ---------------------------------------------------
+    match /avaliacoes_leger/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    match /avaliacoes_circunferenciacintura/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    match /avaliacoes_imc/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    match /avaliacoes_flexibilidade/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    match /avaliacoes_abdominal/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    match /avaliacoes_medicineball/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    match /avaliacoes_saltohorizontal/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    match /avaliacoes_agilidade/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    match /avaliacoes_corrida20m/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    match /avaliacoes_corrida6min/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+    }
+
+    // ---------------------------------------------------
+    // AVALIAÇÕES DE ADULTOS (funcionários) — mesma lógica das
+    // avaliações de aluno acima, só que com criacaoValidaPeloFuncionario()
+    // no lugar de criacaoValidaPeloAluno(). avaliacoes_leger (acima) é
+    // só de crianças; avaliacoes_leger_adulto é a versão pros
+    // funcionários — nomes propositalmente diferentes.
+    // ---------------------------------------------------
+    match /avaliacoes_leger_adulto/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloFuncionario();
+    }
+
+    match /avaliacoes_antropometria_adulto/{id} {
+      allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
+      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
+      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloFuncionario();
+    }
+
+    // ---------------------------------------------------
+    // CONTADORES
+    // Documentos de contagem atômica (ex: próximo código SAFE).
+    // Liberado pra qualquer usuário logado — é só um número,
+    // sem dado sensível, e travar por escola aqui não faz
+    // sentido (o código SAFE é sequencial pro sistema inteiro).
+    // ---------------------------------------------------
+    match /contadores/{id} {
+      allow read, write: if logado();
+    }
+
+    // ---------------------------------------------------
+    // AUDITORIA DE ACESSO DO ALUNO
+    // A sessão anônima só cria (nunca lê/edita/apaga). Quem
+    // administra a escola pode ler o histórico depois.
+    // ---------------------------------------------------
+    match /auditoria_acesso_aluno/{id} {
+      allow create: if souAnonimo();
+      allow read: if podeAcessarEscola(resource.data.escolaId);
+    }
+
+    // ---------------------------------------------------
+    // CONFIGURAÇÕES
+    // Por enquanto tratado como global (só super_admin).
+    // Se surgirem configurações por escola, revisar pra usar
+    // podeAcessarEscola() em vez de souSuperAdmin().
+    // -------------------------------------------------
+    match /configuracoes/{id} {
+      allow read: if logado();
+      allow write: if souSuperAdmin();
+    }
+  }
+}

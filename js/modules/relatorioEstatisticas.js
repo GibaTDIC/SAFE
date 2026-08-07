@@ -30,9 +30,6 @@ const CATEGORIAS_SAUDE = ["Zona de risco à saúde","Zona saudável"];
 
 const TESTES_CONFIG = [
 
-    { colecao:"avaliacoes_leger", titulo:"Léger", campo:"classificacao",
-      categorias:["Zona de risco à saúde","Precisa melhorar","Zona saudável"] },
-
     { colecao:"avaliacoes_circunferenciacintura", titulo:"Perímetro da Cintura (RCE)", campo:"classificacaoSaude",
       categorias:["Zona de risco à saúde","Zona saudável"] },
 
@@ -501,7 +498,6 @@ function valorBrutoDoRegistro(registro, colecao){
 
     const camposPorColecao = {
 
-        avaliacoes_leger: { campo:"vo2max", sufixo:" VO₂máx" },
         avaliacoes_imc: { campo:"imc", sufixo:" IMC" },
         avaliacoes_flexibilidade: { campo:"distanciaCm", sufixo:" cm" },
         avaliacoes_abdominal: { campo:"repeticoes", sufixo:" rep." },

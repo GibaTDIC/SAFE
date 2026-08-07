@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SAFE - Área do Funcionário</title>
+
+<link rel="stylesheet" href="css/global.css">
+<link rel="stylesheet" href="css/aluno.css">
+
+</head>
+
+<body class="corpo-wizard-aluno">
+
+<div class="container-wizard-aluno">
+
+    <!-- ETAPA 1: BOAS-VINDAS -->
+    <div class="etapa-aluno" id="etapaBoasVindas">
+
+        <div class="etapa-aluno-conteudo etapa-centralizada">
+
+            <div class="emoji-gigante">🏃</div>
+
+            <h1>Bem-vindo ao SAFE</h1>
+
+            <p class="texto-wizard">Área do Funcionário — vamos registrar sua avaliação física (Léger e/ou antropometria).</p>
+
+            <button id="btnComecar" class="btn-gigante-wizard">Começar</button>
+
+        </div>
+
+    </div>
+
+    <!-- ETAPA 2: ESCOLA -->
+    <div class="etapa-aluno" id="etapaEscola" style="display:none">
+
+        <div class="etapa-aluno-conteudo">
+
+            <div class="progresso-etapas">
+                <span>Passo 1 de 3</span>
+                <div class="barra-etapas"><div class="barra-etapas-preenchimento" style="width:33%"></div></div>
+            </div>
+
+            <h2>Qual é a sua escola?</h2>
+
+            <select id="escola" class="form-control select-wizard">
+                <option value="">Selecione a escola</option>
+            </select>
+
+            <button id="btnVoltarBoasVindas" class="btn-voltar-wizard">← Voltar</button>
+
+        </div>
+
+    </div>
+
+    <!-- ETAPA 3: NOME -->
+    <div class="etapa-aluno" id="etapaNome" style="display:none">
+
+        <div class="etapa-aluno-conteudo">
+
+            <div class="progresso-etapas">
+                <span>Passo 2 de 3</span>
+                <div class="barra-etapas"><div class="barra-etapas-preenchimento" style="width:66%"></div></div>
+            </div>
+
+            <h2>Qual é o seu nome?</h2>
+
+            <input type="text" id="buscaNomeFuncionario" class="form-control" placeholder="🔎 Digite pra buscar...">
+
+            <div id="listaNomesFuncionarios" class="lista-nomes-aluno"></div>
+
+            <button id="btnVoltarEscola" class="btn-voltar-wizard">← Voltar</button>
+
+        </div>
+
+    </div>
+
+    <!-- ETAPA 4: CONFIRMAR DATA DE NASCIMENTO -->
+    <div class="etapa-aluno" id="etapaSenha" style="display:none">
+
+        <div class="etapa-aluno-conteudo etapa-centralizada">
+
+            <div class="emoji-gigante">🔒</div>
+
+            <h2>Confirme sua identidade</h2>
+
+            <p class="texto-wizard">Para iniciar sua avaliação, informe sua data de nascimento.</p>
+
+            <input type="date" id="senhaFuncionarioInput" class="form-control select-wizard" style="max-width:280px; margin:0 auto;">
+
+            <p id="erroSenhaFuncionario" style="color:#DC2626; font-size:14px; display:none; margin-top:10px;"></p>
+
+            <div style="display:flex; gap:10px; margin-top:20px; justify-content:center;">
+
+                <button id="cancelarSenhaFuncionario" class="btn-secondary" style="padding:14px 24px;">Cancelar</button>
+
+                <button id="confirmarSenhaFuncionario" class="btn btn-primary" style="padding:14px 24px;">Entrar</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ETAPA 5: IDENTIFICAÇÃO -->
+    <div class="etapa-aluno" id="etapaIdentificacao" style="display:none">
+
+        <div class="etapa-aluno-conteudo etapa-centralizada">
+
+            <div class="cartao-identificacao-aluno">
+
+                <div class="emoji-gigante">👤</div>
+
+                <h2 id="nomeIdentificacao"></h2>
+
+                <p id="cargoIdadeIdentificacao" class="texto-wizard"></p>
+
+                <p id="mensagemBoasVindasIdentificacao" class="texto-wizard-destaque"></p>
+
+            </div>
+
+            <button id="btnContinuarIdentificacao" class="btn-gigante-wizard">Continuar</button>
+
+        </div>
+
+    </div>
+
+    <!-- ETAPA 6: ESCOLHER AVALIAÇÃO -->
+    <div class="etapa-aluno" id="etapaEscolherTeste" style="display:none">
+
+        <div class="etapa-aluno-conteudo etapa-larga">
+
+            <h2>Escolha sua avaliação</h2>
+
+            <p class="texto-wizard">Toque num teste pra começar.</p>
+
+            <div id="gridTestesFuncionario" class="grid-cards-testes-aluno"></div>
+
+        </div>
+
+    </div>
+
+    <!-- ETAPA 7: COMO FAZER -->
+    <div class="etapa-aluno" id="etapaComoFazer" style="display:none">
+
+        <div class="etapa-aluno-conteudo etapa-larga">
+
+            <h2 id="tituloComoFazerFuncionario"></h2>
+
+            <img id="imgComoFazerFuncionario" src="" alt="" style="max-width:100%; border-radius:16px; margin:14px 0;">
+
+            <p id="descricaoComoFazerFuncionario" class="texto-wizard"></p>
+
+            <div id="dicasComoFazerFuncionario"></div>
+
+            <button id="btnEntendiComecar" class="btn-gigante-wizard">Entendi, quero registrar meu resultado</button>
+
+            <button id="btnVoltarEscolherTeste" class="btn-voltar-wizard">← Escolher outro teste</button>
+
+        </div>
+
+    </div>
+
+    <!-- ETAPA 8: LANÇAMENTO DO RESULTADO -->
+    <div class="etapa-aluno" id="etapaLancamento" style="display:none">
+
+        <div class="etapa-aluno-conteudo etapa-centralizada">
+
+            <h2>Digite seu resultado</h2>
+
+            <div id="camposLancamentoFuncionario"></div>
+
+            <button id="btnSalvarResultadoFuncionario" class="btn-gigante-wizard">Salvar Resultado</button>
+
+        </div>
+
+    </div>
+
+    <!-- ETAPA 9: FEEDBACK -->
+    <div class="etapa-aluno" id="etapaFeedback" style="display:none">
+
+        <div class="etapa-aluno-conteudo etapa-centralizada">
+
+            <div class="emoji-gigante">🎉</div>
+
+            <h2>Resultado registrado com sucesso!</h2>
+
+            <div id="resumoFeedbackFuncionario" class="cartao-classificacao-aluno"></div>
+
+            <div style="display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; justify-content:center;">
+
+                <button id="btnFazerOutroTeste" class="btn btn-primary" style="padding:14px 24px;">Fazer outro teste</button>
+
+                <a href="index.html" class="link-voltar">Voltar ao início</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script type="module" src="js/modules/funcionarioPortal.js"></script>
+
+</body>
+</html>

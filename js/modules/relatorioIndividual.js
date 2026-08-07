@@ -8,10 +8,9 @@ import { db } from "../core/firebase.js";
 import {
     obterEscolaId,
     souSuperAdmin,
-    mostrarToast
+    mostrarToast,
+    calcularIdade
 } from "../core/utils.js";
-
-import { calcularIdade } from "./leger.js";
 
 import { FAIXAS_SAFE_SCORE, classificarSafeScore } from "../core/safeScore.js";
 
@@ -37,17 +36,11 @@ from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 const CATEGORIAS_DESEMPENHO = ["Fraco","Razoável","Bom","Muito Bom","Excelência"];
 
-const CATEGORIAS_LEGER = ["Zona de risco à saúde","Precisa melhorar","Zona saudável"];
-
 const CATEGORIAS_IMC = ["Zona de risco à saúde","Zona saudável"];
 
+// Léger não entra aqui — não faz parte da bateria do aluno (ver
+// js/modules/leger.js, agora reaplicado só aos funcionários adultos).
 const TESTES_CONFIG = [
-
-    { colecao:"avaliacoes_leger", titulo:"Léger", campo:"classificacao", categorias:CATEGORIAS_LEGER, cor:"#2563EB", colunas:[
-        {label:"Estágio", campo:"estagio"},
-        {label:"VO₂máx", campo:"vo2max"},
-        {label:"Classificação", campo:"classificacao"}
-    ]},
 
     { colecao:"avaliacoes_circunferenciacintura", titulo:"Perímetro da Cintura (RCE)", campo:"classificacaoSaude", categorias:CATEGORIAS_IMC, cor:"#0891B2", colunas:[
         {label:"Cintura (cm)", campo:"cintura"},

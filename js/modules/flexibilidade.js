@@ -19,7 +19,7 @@ import {
 
 import { iconeTeste, iniciarPopupTestes, iniciarModalComoExecutar } from "../core/testeInfoUI.js";
 
-import { calcularIdade } from "./leger.js";
+import { calcularIdade } from "../core/utils.js";
 
 import{
     collection,

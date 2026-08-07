@@ -8,10 +8,9 @@ import { db } from "../core/firebase.js";
 import {
     obterEscolaId,
     souSuperAdmin,
-    mostrarToast
+    mostrarToast,
+    calcularIdade
 } from "../core/utils.js";
-
-import { calcularIdade } from "./leger.js";
 
 import{
     collection,

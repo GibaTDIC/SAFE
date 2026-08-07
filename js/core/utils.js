@@ -136,3 +136,40 @@ export function dataAtual(){
     return new Date().toLocaleDateString("pt-BR");
 
 }
+
+// Idade a partir de uma data de nascimento em ISO (aaaa-mm-dd).
+// Usada por praticamente todos os módulos de avaliação (cálculo de
+// idade do aluno/funcionário na hora do teste).
+export function calcularIdade(dataNascimentoISO){
+
+    if(!dataNascimentoISO){
+
+        return "-";
+
+    }
+
+    const nascimento = new Date(dataNascimentoISO);
+
+    if(isNaN(nascimento)){
+
+        return "-";
+
+    }
+
+    const hoje = new Date();
+
+    let idade = hoje.getFullYear() - nascimento.getFullYear();
+
+    const aindaNaoFezAniversario =
+        hoje.getMonth() < nascimento.getMonth() ||
+        (hoje.getMonth() === nascimento.getMonth() && hoje.getDate() < nascimento.getDate());
+
+    if(aindaNaoFezAniversario){
+
+        idade--;
+
+    }
+
+    return idade;
+
+}

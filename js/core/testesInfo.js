@@ -28,17 +28,31 @@
 export const TESTES_INFO = {
 
     leger: {
-        titulo: "Léger",
+        titulo: "Léger (Funcionários)",
         imagem: "assets/teste-leger.png",
-        descricao: "Corrida de vai-e-vem numa distância de 20 metros, no ritmo de sinais sonoros que aumentam de velocidade a cada estágio. O aluno precisa tocar a linha oposta a cada sinal; quando não conseguir mais acompanhar o ritmo por duas vezes seguidas, o teste termina. Estima a capacidade cardiorrespiratória (VO₂máx).",
+        descricao: "Corrida de vai-e-vem numa distância de 20 metros, no ritmo de sinais sonoros que aumentam de velocidade a cada estágio. O funcionário precisa tocar a linha oposta a cada sinal; quando não conseguir mais acompanhar o ritmo por duas vezes seguidas, o teste termina. Estima a capacidade cardiorrespiratória (VO₂máx). Aplicado só aos funcionários adultos da escola — não faz parte da bateria PROESP-Br dos alunos.",
         cor: "#2563EB",
         unidade: "estágio / VO₂máx",
         video: null,
         materiais: ["Espaço plano de 20 metros", "Cones ou fita marcando as duas linhas", "Áudio do teste de Léger (sinais sonoros)", "Caneta e planilha (ou celular) pra marcar o estágio"],
-        criteriosExecucao: ["Aluno começa atrás de uma das linhas", "A cada sinal sonoro, precisa tocar a linha oposta com um dos pés", "O ritmo aumenta a cada estágio (fica mais rápido)"],
-        criteriosValidacao: ["Conta só o último estágio completo alcançado", "Teste termina quando o aluno não toca a linha a tempo por 2 vezes seguidas"],
-        errosComuns: ["Deixar o aluno adiantar o toque antes do sinal (torna o resultado artificialmente maior)", "Não anotar o estágio E o número de tiros dentro do estágio", "Confundir 1ª falha isolada com o encerramento (só encerra na 2ª falha seguida)"],
-        formaRegistrar: "Anote o último estágio completo e, se possível, quantos tiros dentro dele o aluno completou. O sistema calcula o VO₂máx automaticamente a partir disso."
+        criteriosExecucao: ["Funcionário começa atrás de uma das linhas", "A cada sinal sonoro, precisa tocar a linha oposta com um dos pés", "O ritmo aumenta a cada estágio (fica mais rápido)"],
+        criteriosValidacao: ["Conta só o último estágio completo alcançado", "Teste termina quando o funcionário não toca a linha a tempo por 2 vezes seguidas"],
+        errosComuns: ["Deixar o funcionário adiantar o toque antes do sinal (torna o resultado artificialmente maior)", "Não anotar o estágio E o número de tiros dentro do estágio", "Confundir 1ª falha isolada com o encerramento (só encerra na 2ª falha seguida)"],
+        formaRegistrar: "Anote o último estágio completo e, se possível, quantos tiros dentro dele o funcionário completou. O sistema calcula o VO₂máx automaticamente a partir disso."
+    },
+
+    antropometriaAdulto: {
+        titulo: "Antropometria Adulta",
+        imagem: "assets/teste-circunferenciacintura.png",
+        descricao: "Medição de peso, estatura, circunferência da cintura e 4 dobras cutâneas (subescapular, tríceps, supra-ilíaca e panturrilha medial) de um funcionário adulto da escola. O sistema calcula automaticamente o IMC (classificação da OMS), a Razão Cintura-Estatura (RCE) e o percentual de gordura corporal (protocolo de Petroski).",
+        cor: "#0891B2",
+        unidade: "kg / cm / mm",
+        video: null,
+        materiais: ["Balança calibrada", "Estadiômetro ou fita métrica fixada na parede", "Fita métrica flexível (cintura)", "Adipômetro (compasso de dobras cutâneas)"],
+        criteriosExecucao: ["Funcionário descalço, com roupas leves", "Cintura medida no ponto médio entre a última costela e a crista ilíaca", "Dobras cutâneas medidas do lado direito do corpo, sempre no mesmo ponto anatômico"],
+        criteriosValidacao: ["Repetir a medida da dobra se os valores de duas leituras variarem muito", "Balança zerada antes de cada funcionário"],
+        errosComuns: ["Medir a cintura na altura do umbigo em vez do ponto médio anatômico correto", "Apertar demais o adipômetro na dobra, comprimindo o tecido", "Confundir o lado do corpo medido (deve ser sempre o direito)"],
+        formaRegistrar: "Registre peso (kg), estatura (cm), cintura (cm) e as 4 dobras cutâneas (mm) com uma casa decimal. O sistema calcula IMC, RCE e % de gordura automaticamente."
     },
 
     circunferenciacintura: {

@@ -1,4 +1,4 @@
-<div class="page avaliacao-campo" id="paginaLG" style="--cor-teste:#2563EB">
+<div class="page avaliacao-campo" id="paginaAA" style="--cor-teste:#0891B2">
 
     <div class="cabecalho-teste">
 
@@ -6,9 +6,9 @@
 
         <div class="cabecalho-teste-info">
 
-            <h1>Léger (Funcionários)</h1>
+            <h1>Antropometria Adulta</h1>
 
-            <p>Aptidão Cardiorrespiratória (VO₂máx) — corrida de vai-e-vem, aplicada aos funcionários adultos da escola</p>
+            <p>IMC, Razão Cintura-Estatura e % de Gordura (dobras cutâneas) — aplicado aos funcionários adultos da escola</p>
 
             <div class="cabecalho-teste-meta">
                 <span>👤 <strong id="metaProfessor">-</strong></span>
@@ -25,8 +25,8 @@
     </button>
 
     <div class="info-teste-resumo">
-        <span><strong>Registrar:</strong> total de voltas (tiros de 20m) completadas</span>
-        <span><strong>Calculado automaticamente:</strong> estágio, tempo, distância e VO₂máx</span>
+        <span><strong>Registrar:</strong> peso, estatura, cintura e 4 dobras cutâneas (subescapular, tríceps, supra-ilíaca, panturrilha medial)</span>
+        <span><strong>Calculado automaticamente:</strong> IMC, RCE e % de gordura corporal (protocolo de Petroski)</span>
     </div>
 
     <div id="areaProgresso" class="barra-progresso-container" style="display:none">
@@ -49,14 +49,14 @@
 
     <div id="areaFiltros" class="painel-filtros no-print" style="display:none">
 
-        <input type="text" id="buscaFuncionarioLG" class="form-control" placeholder="🔎 Buscar funcionário por nome...">
+        <input type="text" id="buscaFuncionarioAA" class="form-control" placeholder="🔎 Buscar funcionário por nome...">
 
-        <div class="filtros-situacao" id="filtrosSituacaoLG">
+        <div class="filtros-situacao" id="filtrosSituacaoAA">
             <button data-filtro="todos" class="filtro-situacao ativo">Todos</button>
             <button data-filtro="pendente" class="filtro-situacao">Pendentes</button>
             <button data-filtro="concluido" class="filtro-situacao">Concluídos</button>
             <button data-filtro="ausente" class="filtro-situacao">Ausentes</button>
-            <button data-filtro="risco" class="filtro-situacao">Fraco</button>
+            <button data-filtro="risco" class="filtro-situacao">Em risco</button>
         </div>
 
         <div class="navegacao-alunos">
@@ -66,7 +66,7 @@
 
     </div>
 
-    <div id="gridFuncionariosLG" class="grid-cards-alunos"></div>
+    <div id="gridFuncionariosAA" class="grid-cards-alunos"></div>
 
 </div>
 
@@ -82,20 +82,3 @@
 </div>
 
 <div id="fundoPainelLateral" class="fundo-painel-lateral"></div>
-
-<div id="modalValidacaoLG" class="modal">
-
-    <div class="modal-content" style="max-width:380px; text-align:center;">
-
-        <h3>⚠️ Valor fora da faixa esperada</h3>
-
-        <p id="mensagemValidacaoLG" style="margin:14px 0; color:#475569;"></p>
-
-        <div style="display:flex; gap:10px;">
-            <button id="btnCancelarValidacaoLG" class="btn-secondary" style="flex:1;">Corrigir</button>
-            <button id="btnConfirmarValidacaoLG" class="btn btn-primary" style="flex:1;">Confirmar assim mesmo</button>
-        </div>
-
-    </div>
-
-</div>

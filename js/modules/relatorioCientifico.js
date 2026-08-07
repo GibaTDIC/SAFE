@@ -14,10 +14,9 @@ import { db } from "../core/firebase.js";
 import {
     obterEscolaId,
     souSuperAdmin,
-    mostrarToast
+    mostrarToast,
+    calcularIdade
 } from "../core/utils.js";
-
-import { calcularIdade } from "./leger.js";
 
 import{
     collection,
@@ -42,7 +41,6 @@ const VARIAVEIS_NUMERICAS = [
     { titulo:"Peso (kg)", colecao:"avaliacoes_imc", campo:"peso" },
     { titulo:"Estatura (cm)", colecao:"avaliacoes_imc", campo:"estatura" },
     { titulo:"IMC", colecao:"avaliacoes_imc", campo:"imc" },
-    { titulo:"Léger (VO₂máx)", colecao:"avaliacoes_leger", campo:"vo2max" },
     { titulo:"Flexibilidade (cm)", colecao:"avaliacoes_flexibilidade", campo:"distanciaCm" },
     { titulo:"Abdominal (repetições)", colecao:"avaliacoes_abdominal", campo:"repeticoes" },
     { titulo:"Medicine Ball (cm)", colecao:"avaliacoes_medicineball", campo:"distanciaCm" },
@@ -58,9 +56,6 @@ const TESTES_CATEGORICOS = [
 
     { titulo:"Perímetro da Cintura (RCE)", colecao:"avaliacoes_circunferenciacintura", campo:"classificacaoSaude",
       categorias:["Zona de risco à saúde","Zona saudável"] },
-
-    { titulo:"Léger", colecao:"avaliacoes_leger", campo:"classificacao",
-      categorias:["Zona de risco à saúde","Precisa melhorar","Zona saudável"] },
 
     { titulo:"IMC", colecao:"avaliacoes_imc", campo:"classificacaoSaude",
       categorias:["Zona de risco à saúde","Zona saudável"] },

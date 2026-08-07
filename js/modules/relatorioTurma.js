@@ -27,12 +27,9 @@ from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
 const CATEGORIAS_DESEMPENHO = ["Fraco","Razoável","Bom","Muito Bom","Excelência"];
 
-const CATEGORIAS_LEGER = ["Zona de risco à saúde","Precisa melhorar","Zona saudável"];
-
 const CATEGORIAS_IMC = ["Zona de risco à saúde","Zona saudável"];
 
 const TESTES_CONFIG = [
-    { colecao:"avaliacoes_leger", titulo:"Léger", campo:"classificacao", categorias:CATEGORIAS_LEGER, cor:"#2563EB" },
     { colecao:"avaliacoes_circunferenciacintura", titulo:"Perímetro da Cintura (RCE)", campo:"classificacaoSaude", categorias:CATEGORIAS_IMC, cor:"#0891B2" },
     { colecao:"avaliacoes_imc", titulo:"IMC", campo:"classificacaoSaude", categorias:CATEGORIAS_IMC, cor:"#DC2626" },
     { colecao:"avaliacoes_flexibilidade", titulo:"Flexibilidade", campo:"classificacaoDesempenho", categorias:CATEGORIAS_DESEMPENHO, cor:"#16A34A" },
@@ -696,7 +693,6 @@ function renderizarRecomendacoes(resultadosPorTeste){
 
     const sugestoesPorTeste = {
 
-        "Léger": "priorizar corridas intervaladas e jogos com deslocamento contínuo",
         "IMC": "conversar com a família sobre alimentação e rotina de atividade física",
         "Flexibilidade": "incluir alongamentos no início/fim de toda aula",
         "Resist. Muscular": "priorizar exercícios de força com o peso do próprio corpo (abdominais, pranchas)",

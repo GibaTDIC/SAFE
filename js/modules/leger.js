@@ -42,12 +42,18 @@ from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 // naquele estágio, acumulado = total de tiros até o fim
 // do estágio (inclusive).
 // Índice 0 não é usado (estágio começa em 1).
+//
+// Velocidades conferidas contra o "Manual prático para a
+// aplicação do teste de Vai-e-Vem (20m) de Léger" (GPAQ —
+// Añez & Hino, v2): "O teste inicia-se com uma velocidade de
+// 8,5 km/h e a cada estágio aumenta 0,5 km/h." O nível 1
+// estava registrado como 8,0 — corrigido pra 8,5.
 // ======================================================
 
 export const ESTAGIOS_LEGER = [
 
     null,
-    { nivel:1,  velocidade:8.0,  voltas:7,  acumulado:7   },
+    { nivel:1,  velocidade:8.5,  voltas:7,  acumulado:7   },
     { nivel:2,  velocidade:9.0,  voltas:8,  acumulado:15  },
     { nivel:3,  velocidade:9.5,  voltas:8,  acumulado:23  },
     { nivel:4,  velocidade:10.0, voltas:9,  acumulado:32  },
@@ -73,21 +79,24 @@ export const ESTAGIOS_LEGER = [
 
 // ======================================================
 // CLASSIFICAÇÃO — APTIDÃO CARDIORRESPIRATÓRIA EM ADULTOS
-// Fonte: tabela normativa de VO2máx por sexo e faixa etária,
-// amplamente publicada (Cooper Institute / ACSM's Guidelines
-// for Exercise Testing and Prescription). Mantém os mesmos 5
-// rótulos usados no restante do SAFE pros testes de desempenho
-// (Fraco/Razoável/Bom/Muito Bom/Excelência), pra consistência
-// visual — os VALORES de corte, porém, são de uma fonte adulta
-// genérica, digitados de memória.
 //
-// ATENÇÃO — PROVISÓRIO: confira estes números contra uma fonte
-// oficial (ex: edição específica do ACSM's Guidelines) antes de
-// liberar pra avaliações reais de funcionários. Diferente da
-// tabela de crianças (PROESP-Br, conferida contra o manual
-// oficial), esta ainda não foi validada contra uma fonte
-// primária — trocar os valores abaixo se você tiver uma tabela
-// de referência própria.
+// IMPORTANTE: isso é só o rótulo (Fraco/Bom/Excelência etc.) —
+// o VALOR do VO2máx em si (calcularResultadoLeger, abaixo) já
+// está confirmado contra o "Manual prático para a aplicação do
+// teste de Vai-e-Vem (20m) de Léger" (GPAQ — Añez & Hino, v2).
+//
+// As FAIXAS de classificação abaixo, porém, continuam de uma
+// tabela normativa de VO2máx por sexo e faixa etária amplamente
+// publicada (Cooper Institute / ACSM's Guidelines for Exercise
+// Testing and Prescription) digitada de memória — mantém os
+// mesmos 5 rótulos usados no restante do SAFE pros testes de
+// desempenho (Fraco/Razoável/Bom/Muito Bom/Excelência) só por
+// consistência visual.
+//
+// ATENÇÃO — PROVISÓRIO: confira estas FAIXAS contra uma fonte
+// oficial (ex: edição específica do ACSM's Guidelines, ou a
+// tabela por nível/sexo do "20m Beep Test Protocol and Scoring"
+// que você já mandou) antes de liberar pra avaliações reais.
 // ======================================================
 
 const ACSM_VO2MAX = {
@@ -204,12 +213,26 @@ export function calcularResultadoLeger(estagioCompleto, voltaNoProximo, idade){
 
     const distanciaM = (infoEstagio.acumulado + voltaNoProximo) * 20;
 
-    // VO2máx (Léger, Mercier, Gadoury & Lambert, 1988)
+    // VO2máx — duas fórmulas oficiais, conforme o "Manual prático para
+    // a aplicação do teste de Vai-e-Vem (20m) de Léger" (GPAQ — Añez &
+    // Hino, v2):
+    //
+    // Menores de 18 anos (Léger, Mercier, Gadoury & Lambert, 1988):
+    //   VO2max = 31.025 + 3.238×Vel - 3.248×Idade + 0.1536×Vel×Idade
+    //
+    // 18 anos ou mais: a idade sai da equação, só a velocidade do
+    // último estágio completo importa:
+    //   VO2max = -27.4 + 6×Vel
+    //
+    // (As duas coincidem exatamente em Idade=18 — não é um "salto" na
+    // fronteira, é matematicamente contínuo.)
     const V = infoEstagio.velocidade;
 
     const A = idade;
 
-    const vo2max = 31.025 + (3.238 * V) - (3.248 * A) + (0.1536 * A * V);
+    const vo2max = A < 18
+        ? 31.025 + (3.238 * V) - (3.248 * A) + (0.1536 * A * V)
+        : -27.4 + (6 * V);
 
     return {
 

@@ -221,6 +221,15 @@
                     class="form-control search-box"
                     placeholder="Pesquisar aluno...">
 
+                <!-- Só aparece pro super_admin — quem tem uma escola só
+                     não precisa filtrar por ela (mesmo padrão de
+                     escolaDestinoImportacao, mais abaixo). -->
+                <select id="filtroEscolaAluno" class="form-control" style="max-width:220px; display:none;">
+
+                    <option value="">Todas as escolas</option>
+
+                </select>
+
                 <select id="filtroTurmaAluno" class="form-control" style="max-width:220px">
 
                     <option value="">Todas as turmas</option>

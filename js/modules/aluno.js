@@ -50,6 +50,8 @@ let tabela;
 
 let pesquisa;
 
+let filtroEscolaAluno;
+
 let filtroTurmaAluno;
 
 let modal;
@@ -110,6 +112,8 @@ function obterElementos(){
     tabela = document.getElementById("listaAlunos");
 
     pesquisa = document.getElementById("pesquisaAluno");
+
+    filtroEscolaAluno = document.getElementById("filtroEscolaAluno");
 
     filtroTurmaAluno = document.getElementById("filtroTurmaAluno");
 
@@ -205,6 +209,14 @@ function configurarEventos(){
         "keyup",
 
         pesquisarAluno
+
+    );
+
+    filtroEscolaAluno.addEventListener(
+
+        "change",
+
+        aoTrocarFiltroEscola
 
     );
 
@@ -563,6 +575,25 @@ async function carregarEscolas(){
 
         }
 
+        // Filtro de escola na listagem — só faz sentido pro super_admin,
+        // que vê alunos de todas as escolas juntos. Quem não é
+        // super_admin já só enxerga a própria escola (a consulta em
+        // carregarAlunos()/carregarTurmas() já vem filtrada), então o
+        // filtro fica escondido pra não confundir à toa.
+        if(souSuperAdmin()){
+
+            filtroEscolaAluno.innerHTML = `<option value="">Todas as escolas</option>`;
+
+            escolas.forEach(escola=>{
+
+                filtroEscolaAluno.innerHTML += `<option value="${escola.id}">${escola.nome}</option>`;
+
+            });
+
+            filtroEscolaAluno.style.display = "inline-block";
+
+        }
+
     }catch(erro){
 
         console.error(erro);
@@ -570,6 +601,33 @@ async function carregarEscolas(){
         mostrarToast("Erro ao carregar escolas.", "erro");
 
     }
+
+}
+
+// ======================================================
+// FILTRO DE ESCOLA NA LISTAGEM (cascata Escola → Turma)
+// Reaproveita o array `turmas` já carregado, igual a
+// atualizarTurmasDoFormulario() faz pro modal — sem outra
+// consulta ao banco.
+// ======================================================
+
+function aoTrocarFiltroEscola(){
+
+    const escolaFiltro = filtroEscolaAluno.value;
+
+    filtroTurmaAluno.innerHTML = `<option value="">Todas as turmas</option>`;
+
+    const turmasParaMostrar = escolaFiltro
+        ? turmas.filter(t => t.escolaId === escolaFiltro)
+        : turmas;
+
+    turmasParaMostrar.forEach(turma=>{
+
+        filtroTurmaAluno.innerHTML += `<option value="${turma.id}">${turma.nome}</option>`;
+
+    });
+
+    pesquisarAluno();
 
 }
 
@@ -903,7 +961,15 @@ function pesquisarAluno(){
 
     const turmaFiltrada = filtroTurmaAluno.value;
 
+    const escolaFiltrada = filtroEscolaAluno.value;
+
     let resultado = alunos;
+
+    if(escolaFiltrada){
+
+        resultado = resultado.filter(aluno=>aluno.escolaId===escolaFiltrada);
+
+    }
 
     if(turmaFiltrada){
 

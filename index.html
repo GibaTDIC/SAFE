@@ -48,9 +48,38 @@
         Avaliador e Coordenador
     </a>
 
+    <button type="button" id="btnPorQueAvaliamos" class="link-por-que-avaliamos">
+        <i class="bi bi-volume-up"></i>
+        Por que fazemos essa avaliação?
+    </button>
+
     <footer>SAFE © 2026 — desenvolvido por Gibabit</footer>
 
 </div>
+
+<div id="modalPorQueAvaliamos" class="modal">
+
+    <div class="modal-content" style="max-width:420px; text-align:center;">
+
+        <h3>Por que fazemos essa avaliação?</h3>
+
+        <p style="color:#64748b; font-size:14px; margin:10px 0 18px;">
+            Ouça a explicação sobre o propósito da avaliação física escolar.
+        </p>
+
+        <audio id="audioPorQueAvaliamos" controls style="width:100%;" preload="none">
+            <source src="assets/audio/por-que-avaliamos.mp3" type="audio/mpeg">
+        </audio>
+
+        <button type="button" id="btnFecharPorQueAvaliamos" class="btn-secondary" style="margin-top:18px;">
+            Fechar
+        </button>
+
+    </div>
+
+</div>
+
+<script type="module" src="js/core/index.js"></script>
 
 </body>
 </html>

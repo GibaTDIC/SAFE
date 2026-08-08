@@ -243,6 +243,55 @@ body{
 
 }
 
+/* ===========================
+   LINK "POR QUE AVALIAMOS" — texto discreto, sem peso visual,
+   pra não competir com os cards de entrada.
+=========================== */
+
+.link-por-que-avaliamos{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    margin-top:18px;
+
+    background:none;
+
+    border:none;
+
+    color:#94a3b8;
+
+    font-size:12.5px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    text-decoration:underline;
+
+    text-decoration-color:transparent;
+
+    transition:.2s;
+
+}
+
+.link-por-que-avaliamos i{
+
+    font-size:13px;
+
+}
+
+.link-por-que-avaliamos:hover{
+
+    color:var(--cor-primaria, #1565C0);
+
+    text-decoration-color:currentColor;
+
+}
+
 .pagina-inicial footer{
 
     margin-top:40px;

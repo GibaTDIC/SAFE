@@ -1861,6 +1861,43 @@ table{
         grid-template-columns:1fr;
 
     }
+
+    /* Menos espaço morto nas laterais — #content(30px) + .page(25px)
+       + .card(26px) somados dão mais de 80px de sobra de cada lado,
+       quase 1/4 da tela num celular comum. */
+    #content{
+
+        padding:14px;
+
+    }
+
+    .page{
+
+        padding:0;
+
+    }
+
+    .card{
+
+        padding:16px;
+
+    }
+
+    .page-title{
+
+        font-size:22px;
+
+    }
+
+    /* Botão e campos da barra de ferramentas (ex: "Novo Funcionário",
+       busca) ocupam a linha inteira em vez de ficar pequenos com
+       espaço sobrando dos dois lados — mais fácil de tocar também. */
+    .toolbar-left > *,
+    .toolbar-right > *{
+
+        width:100%;
+
+    }
 }
 
 /* ===========================

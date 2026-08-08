@@ -312,6 +312,8 @@ footer{
 
     display:flex;
 
+    flex-wrap:wrap;
+
     gap:15px;
 
     align-items:center;
@@ -323,6 +325,8 @@ footer{
 .toolbar-right{
 
     display:flex;
+
+    flex-wrap:wrap;
 
     gap:15px;
 

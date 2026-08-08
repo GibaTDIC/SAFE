@@ -45,7 +45,7 @@ import { iconeTeste } from "../core/testeInfoUI.js";
 
 import { TESTES_INFO } from "../core/testesInfo.js";
 
-import { calcularResultadoLeger, converterVoltasParaEstagio, classificarACSM } from "./leger.js";
+import { calcularResultadoLeger, converterVoltasParaEstagio, classificarVO2max } from "./leger.js";
 
 import { calcularRCE, classificarSaude as classificarRCEAdulto } from "./circunferenciacintura.js";
 
@@ -93,7 +93,7 @@ const TESTES_CONFIG = {
                 distanciaM: resultado.distanciaM,
                 tempoSegundos: resultado.tempoSegundos,
                 vo2max: resultado.vo2max,
-                classificacao: classificarACSM(resultado.vo2max, idade, sexo)
+                classificacao: classificarVO2max(resultado.vo2max, idade, sexo)
             };
 
         },

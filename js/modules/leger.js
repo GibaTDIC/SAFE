@@ -80,50 +80,47 @@ export const ESTAGIOS_LEGER = [
 // ======================================================
 // CLASSIFICAÇÃO — APTIDÃO CARDIORRESPIRATÓRIA EM ADULTOS
 //
-// IMPORTANTE: isso é só o rótulo (Fraco/Bom/Excelência etc.) —
-// o VALOR do VO2máx em si (calcularResultadoLeger, abaixo) já
-// está confirmado contra o "Manual prático para a aplicação do
-// teste de Vai-e-Vem (20m) de Léger" (GPAQ — Añez & Hino, v2).
+// Fonte: HERDY, A.H.; CAIXETA, A. "Classificação Nacional da
+// Aptidão Cardiorrespiratória pelo Consumo Máximo de Oxigênio".
+// Arq Bras Cardiol. 2016;106(5):389-395. DOI: 10.5935/abc.20160070
+// (SciELO). Tabelas 4 e 5 do artigo — amostra brasileira de 2.837
+// TCPE (teste cardiopulmonar de exercício) em esteira, indivíduos
+// saudáveis e ativos, 15-74 anos. Valores reproduzidos exatamente
+// como publicados (inclusive o pequeno "furo" 17,54→17,65 na faixa
+// masculina 55-64, que já está assim no artigo original).
 //
-// As FAIXAS de classificação abaixo, porém, continuam de uma
-// tabela normativa de VO2máx por sexo e faixa etária amplamente
-// publicada (Cooper Institute / ACSM's Guidelines for Exercise
-// Testing and Prescription) digitada de memória — mantém os
-// mesmos 5 rótulos usados no restante do SAFE pros testes de
-// desempenho (Fraco/Razoável/Bom/Muito Bom/Excelência) só por
-// consistência visual.
-//
-// ATENÇÃO — PROVISÓRIO: confira estas FAIXAS contra uma fonte
-// oficial (ex: edição específica do ACSM's Guidelines, ou a
-// tabela por nível/sexo do "20m Beep Test Protocol and Scoring"
-// que você já mandou) antes de liberar pra avaliações reais.
+// Faixas etárias do próprio estudo (15-24 a 65-74, em blocos de
+// 10 anos) — diferente das faixas usadas pro resto do SAFE.
+// Idade fora da faixa (< 15 ou > 74) usa a faixa mais próxima.
 // ======================================================
 
-const ACSM_VO2MAX = {
+const VO2MAX_HERDY_CAIXETA = {
 
     masculino: {
 
-        29: { fraco:33, razoavel:37, bom:42, muitoBom:46 },
-        39: { fraco:31, razoavel:36, bom:41, muitoBom:45 },
-        49: { fraco:28, razoavel:32, bom:36, muitoBom:41 },
-        59: { fraco:25, razoavel:29, bom:33, muitoBom:37 },
-        99: { fraco:21, razoavel:25, bom:29, muitoBom:33 }
+        24: { muitoFraca:25.30, fraca:40.48, regular:48.07, boa:53.13 },
+        34: { muitoFraca:23.70, fraca:37.92, regular:45.03, boa:49.77 },
+        44: { muitoFraca:22.70, fraca:36.32, regular:43.13, boa:47.67 },
+        54: { muitoFraca:20.25, fraca:32.40, regular:38.47, boa:42.52 },
+        64: { muitoFraca:17.54, fraca:28.24, regular:33.53, boa:37.06 },
+        74: { muitoFraca:15.00, fraca:24.00, regular:28.50, boa:31.50 }
 
     },
 
     feminino: {
 
-        29: { fraco:28, razoavel:31, bom:34, muitoBom:38 },
-        39: { fraco:27, razoavel:30, bom:33, muitoBom:37 },
-        49: { fraco:25, razoavel:28, bom:31, muitoBom:34 },
-        59: { fraco:21, razoavel:24, bom:27, muitoBom:32 },
-        99: { fraco:18, razoavel:21, bom:24, muitoBom:28 }
+        24: { muitoFraca:19.45, fraca:31.12, regular:36.95, boa:40.84 },
+        34: { muitoFraca:19.05, fraca:30.48, regular:36.19, boa:40.00 },
+        44: { muitoFraca:17.45, fraca:27.92, regular:33.15, boa:34.08 },
+        54: { muitoFraca:15.55, fraca:24.88, regular:29.54, boa:32.65 },
+        64: { muitoFraca:14.30, fraca:22.88, regular:27.17, boa:30.03 },
+        74: { muitoFraca:12.55, fraca:20.08, regular:23.84, boa:26.35 }
 
     }
 
 };
 
-export function classificarACSM(vo2max, idade, sexo){
+export function classificarVO2max(vo2max, idade, sexo){
 
     if(vo2max === null || vo2max === undefined || isNaN(vo2max)){
 
@@ -133,39 +130,39 @@ export function classificarACSM(vo2max, idade, sexo){
 
     const chaveSexo = (sexo || "").toLowerCase() === "feminino" ? "feminino" : "masculino";
 
-    const idadeValida = typeof idade === "number" ? Math.max(idade, 20) : 30;
+    const idadeValida = typeof idade === "number" ? Math.max(idade, 15) : 30;
 
-    const faixasEtarias = Object.keys(ACSM_VO2MAX[chaveSexo]).map(Number).sort((a,b) => a-b);
+    const faixasEtarias = Object.keys(VO2MAX_HERDY_CAIXETA[chaveSexo]).map(Number).sort((a,b) => a-b);
 
     const faixaEtaria = faixasEtarias.find(limite => idadeValida <= limite) ?? faixasEtarias[faixasEtarias.length - 1];
 
-    const corte = ACSM_VO2MAX[chaveSexo][faixaEtaria];
+    const corte = VO2MAX_HERDY_CAIXETA[chaveSexo][faixaEtaria];
 
-    if(vo2max <= corte.fraco){
+    if(vo2max <= corte.muitoFraca){
 
-        return "Fraco";
-
-    }
-
-    if(vo2max <= corte.razoavel){
-
-        return "Razoável";
+        return "Muito Fraca";
 
     }
 
-    if(vo2max <= corte.bom){
+    if(vo2max <= corte.fraca){
 
-        return "Bom";
-
-    }
-
-    if(vo2max <= corte.muitoBom){
-
-        return "Muito Bom";
+        return "Fraca";
 
     }
 
-    return "Excelência";
+    if(vo2max <= corte.regular){
+
+        return "Regular";
+
+    }
+
+    if(vo2max <= corte.boa){
+
+        return "Boa";
+
+    }
+
+    return "Excelente";
 
 }
 
@@ -585,8 +582,9 @@ function obterListaFiltrada(){
     }else if(filtroAtual === "risco"){
 
         // Sem "zona de saúde" pra adultos aqui — usa a classificação
-        // "Fraco" (tier mais baixo do ACSM) como equivalente de alerta.
-        lista = lista.filter(d => d.ultimaClassificacao === "Fraco");
+        // "Muito Fraca" (tier mais baixo de Herdy & Caixeta) como
+        // equivalente de alerta.
+        lista = lista.filter(d => d.ultimaClassificacao === "Muito Fraca");
 
     }
 
@@ -788,7 +786,7 @@ async function salvarResultado(funcionarioId, forcarSemValidar = false){
 
     }
 
-    const classificacao = classificarACSM(resultado.vo2max, idade, dadosFuncionario.funcionario.sexo);
+    const classificacao = classificarVO2max(resultado.vo2max, idade, dadosFuncionario.funcionario.sexo);
 
     const contexto = obterContextoUsuario();
 

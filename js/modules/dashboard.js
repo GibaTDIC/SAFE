@@ -194,7 +194,7 @@ async function carregarUltimasAtividades(){
                     nome: dados.nome || "Aluno",
                     titulo,
                     dataTeste: dados.dataTeste ? dados.dataTeste.toMillis() : 0,
-                    origem: dados.origem === "aluno" ? "autopreenchido pelo aluno" : "registrado pelo professor"
+                    origem: dados.origem === "aluno" ? "autopreenchido pelo aluno" : "registrado pelo avaliador"
 
                 });
 

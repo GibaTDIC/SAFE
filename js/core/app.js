@@ -90,6 +90,8 @@ onAuthStateChanged(auth, async (usuario) => {
 
     exibirBannerSomenteLeitura();
 
+    aplicarVisibilidadePorPapel();
+
     await montarSeletorDeEscola();
 
     iniciarMenu();
@@ -152,6 +154,53 @@ function exibirBannerSomenteLeitura(){
 
 }
 
+// ======================================================
+// ESCONDE ITENS DE MENU CONFORME O PAPEL
+// Coordenador (admin_escola) não aplica avaliação — some os
+// grupos "Avaliações Físicas" e "Avaliação de Adultos" inteiros.
+// Avaliador (professor) não gerencia outros avaliadores nem
+// escolas — some só esses dois itens, dentro de "Cadastros".
+// Isso é só conveniência de navegação, igual ao banner de
+// somente leitura acima — a trava de verdade está nas regras
+// do Firestore (podeAplicarAvaliacao / escolas / usuarios).
+// ======================================================
+
+function aplicarVisibilidadePorPapel(){
+
+    const papel = sessionStorage.getItem("safe_papel");
+
+    if(papel === "admin_escola"){
+
+        ["avaliacoes", "adultos"].forEach(grupo=>{
+
+            const elemento = document.querySelector(`.menu-group[data-grupo="${grupo}"]`);
+
+            if(elemento){
+
+                elemento.style.display = "none";
+
+            }
+
+        });
+
+    }else if(papel === "professor"){
+
+        ["professores", "escolas"].forEach(pagina=>{
+
+            const item = document.querySelector(`.sidebar li[data-page="${pagina}"]`);
+
+            if(item){
+
+                item.style.display = "none";
+
+            }
+
+        });
+
+    }
+
+}
+
 function exibirUsuarioLogado(){
 
     const elemento = document.getElementById("usuarioLogado");
@@ -169,8 +218,8 @@ function exibirUsuarioLogado(){
     const rotulosPapel = {
 
         super_admin: "Super Admin",
-        admin_escola: "Admin da Escola",
-        professor: "Professor"
+        admin_escola: "Coordenador",
+        professor: "Avaliador"
 
     };
 

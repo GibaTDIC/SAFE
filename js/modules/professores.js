@@ -3,7 +3,7 @@
 // SAFE
 // Sistema de Avaliação Física Escolar
 //
-// Módulo: Cadastro de Professores / Admin de Escola
+// Módulo: Cadastro de Avaliadores / Coordenador de Escola
 //
 // Arquivo:
 // js/modules/professores.js
@@ -230,7 +230,7 @@ function aoTrocarPapel(){
 
     if(papelProfessor.value === "admin_escola" && marcadosAtuais.length > 1){
 
-        mostrarToast("Esse professor atende mais de uma escola — escolha qual delas ele vai coordenar como admin.", "erro");
+        mostrarToast("Esse avaliador atende mais de uma escola — escolha qual delas ele vai coordenar como coordenador.", "erro");
 
         marcarEscolas([], false);
 
@@ -297,7 +297,7 @@ async function carregarProfessores(){
 
         console.error(erro);
 
-        mostrarToast("Erro ao carregar professores.", "erro");
+        mostrarToast("Erro ao carregar avaliadores.", "erro");
 
     }finally{
 
@@ -343,7 +343,7 @@ function renderizarTabela(lista){
         listaProfessores.innerHTML = `
 
             <tr>
-                <td colspan="6" style="text-align:center">Nenhum professor cadastrado.</td>
+                <td colspan="6" style="text-align:center">Nenhum avaliador cadastrado.</td>
             </tr>
 
         `;
@@ -354,7 +354,7 @@ function renderizarTabela(lista){
 
     lista.forEach(p=>{
 
-        const papelTexto = p.papel === "admin_escola" ? "Admin da Escola" : "Professor";
+        const papelTexto = p.papel === "admin_escola" ? "Coordenador" : "Avaliador";
 
         const nomesEscolas = (p.escolaIds || [])
 
@@ -396,7 +396,7 @@ function abrirModalNovo(){
 
     uidEditando = null;
 
-    tituloModalProfessor.textContent = "Novo Professor";
+    tituloModalProfessor.textContent = "Novo Avaliador";
 
     professorUidInput.value = "";
 
@@ -456,7 +456,7 @@ window.editarProfessor = function(uid){
 
     uidEditando = uid;
 
-    tituloModalProfessor.textContent = "Editar Professor";
+    tituloModalProfessor.textContent = "Editar Avaliador";
 
     professorUidInput.value = uid;
 
@@ -542,7 +542,7 @@ async function salvarProfessor(){
 
                 if(dados.papel === "admin_escola" && dados.escolaIds.length !== 1){
 
-                    mostrarToast("Admin da Escola só pode coordenar uma única escola.", "erro");
+                    mostrarToast("Coordenador só pode atender uma única escola.", "erro");
 
                     return;
 
@@ -552,7 +552,7 @@ async function salvarProfessor(){
 
             await updateDoc(doc(db,"usuarios",uidEditando), dados);
 
-            mostrarToast("Professor atualizado com sucesso.");
+            mostrarToast("Avaliador atualizado com sucesso.");
 
         }else{
 
@@ -583,7 +583,7 @@ async function salvarProfessor(){
 
             if(papel === "admin_escola" && escolaIds.length !== 1){
 
-                mostrarToast("Admin da Escola só pode coordenar uma única escola.", "erro");
+                mostrarToast("Coordenador só pode atender uma única escola.", "erro");
 
                 return;
 
@@ -618,7 +618,7 @@ async function salvarProfessor(){
 
             });
 
-            mostrarToast("Professor cadastrado com sucesso.");
+            mostrarToast("Avaliador cadastrado com sucesso.");
 
         }
 
@@ -713,7 +713,7 @@ window.alternarSomenteLeituraProfessor = async function(uid, ligarSomenteLeitura
 
         await updateDoc(doc(db,"usuarios",uid), { somenteLeitura: ligarSomenteLeitura });
 
-        mostrarToast(ligarSomenteLeitura ? "Professor em modo somente leitura." : "Restrição removida.");
+        mostrarToast(ligarSomenteLeitura ? "Avaliador em modo somente leitura." : "Restrição removida.");
 
         await carregarProfessores();
 
@@ -735,7 +735,7 @@ window.alternarAtivoProfessor = async function(uid, ativarDeNovo){
 
     const acao = ativarDeNovo ? "reativar o acesso" : "desativar (bloquear o acesso)";
 
-    if(!confirm(`Confirma ${acao} desse professor?`)){
+    if(!confirm(`Confirma ${acao} desse avaliador?`)){
 
         return;
 
@@ -747,7 +747,7 @@ window.alternarAtivoProfessor = async function(uid, ativarDeNovo){
 
         await updateDoc(doc(db,"usuarios",uid), { ativo: ativarDeNovo });
 
-        mostrarToast(ativarDeNovo ? "Professor reativado." : "Professor desativado.");
+        mostrarToast(ativarDeNovo ? "Avaliador reativado." : "Avaliador desativado.");
 
         await carregarProfessores();
 
@@ -767,7 +767,7 @@ window.alternarAtivoProfessor = async function(uid, ativarDeNovo){
 
 window.excluirProfessor = async function(uid){
 
-    if(!confirm("Excluir DEFINITIVAMENTE este professor?\n\nATENÇÃO: a conta de autenticação (e-mail/senha) NÃO é apagada — só o cadastro aqui. Se um dia você tentar recriar um professor com esse MESMO e-mail, vai dar erro de \"e-mail já cadastrado\", porque a conta antiga ainda existe no Firebase. Pra reaproveitar o e-mail, você precisaria apagar a conta manualmente em Authentication, no console do Firebase.\n\nSe é só pra tirar o acesso dele por enquanto (podendo reativar depois sem esse problema), cancele e use o botão de Desativar em vez deste.")){
+    if(!confirm("Excluir DEFINITIVAMENTE este avaliador?\n\nATENÇÃO: a conta de autenticação (e-mail/senha) NÃO é apagada — só o cadastro aqui. Se um dia você tentar recriar um avaliador com esse MESMO e-mail, vai dar erro de \"e-mail já cadastrado\", porque a conta antiga ainda existe no Firebase. Pra reaproveitar o e-mail, você precisaria apagar a conta manualmente em Authentication, no console do Firebase.\n\nSe é só pra tirar o acesso dele por enquanto (podendo reativar depois sem esse problema), cancele e use o botão de Desativar em vez deste.")){
 
         return;
 
@@ -779,7 +779,7 @@ window.excluirProfessor = async function(uid){
 
         await deleteDoc(doc(db,"usuarios",uid));
 
-        mostrarToast("Professor excluído.");
+        mostrarToast("Avaliador excluído.");
 
         await carregarProfessores();
 
@@ -787,7 +787,7 @@ window.excluirProfessor = async function(uid){
 
         console.error(erro);
 
-        mostrarToast("Erro ao excluir professor.", "erro");
+        mostrarToast("Erro ao excluir avaliador.", "erro");
 
     }finally{
 

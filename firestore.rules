@@ -90,6 +90,21 @@ service cloud.firestore {
       return souSuperAdmin() || (souDaEscola(escolaId) && !souSomenteLeitura());
     }
 
+    // Avaliador (professor) vinculado a essa escola — quem de fato
+    // aplica os testes. Coordenador (admin_escola) NÃO é avaliador.
+    function souAvaliador(escolaId) {
+      return logado() && meuPapel() == 'professor' && minhasEscolas().hasAny([escolaId]);
+    }
+
+    // Só quem aplica avaliação pode escrever nas coleções avaliacoes_*:
+    // super_admin (irrestrito) ou avaliador da escola, sem somente-leitura.
+    // Coordenador (admin_escola) fica de fora de propósito — ele só lê os
+    // resultados (relatórios), não aplica teste. Diferente de
+    // podeEscreverNaEscola, que ainda inclui admin_escola.
+    function podeAplicarAvaliacao(escolaId) {
+      return souSuperAdmin() || (souAvaliador(escolaId) && !souSomenteLeitura());
+    }
+
     // Só quem administra a escola (não um professor comum) pode
     // editar/excluir turma — professor só visualiza e cria.
     function podeGerenciarTurma(escolaId) {
@@ -223,62 +238,62 @@ service cloud.firestore {
     // ---------------------------------------------------
     match /avaliacoes_leger/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     match /avaliacoes_circunferenciacintura/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     match /avaliacoes_imc/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     match /avaliacoes_flexibilidade/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     match /avaliacoes_abdominal/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     match /avaliacoes_medicineball/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     match /avaliacoes_saltohorizontal/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     match /avaliacoes_agilidade/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     match /avaliacoes_corrida20m/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     match /avaliacoes_corrida6min/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloAluno();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloAluno();
     }
 
     // ---------------------------------------------------
@@ -290,14 +305,14 @@ service cloud.firestore {
     // ---------------------------------------------------
     match /avaliacoes_leger_adulto/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloFuncionario();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloFuncionario();
     }
 
     match /avaliacoes_antropometria_adulto/{id} {
       allow read: if podeAcessarEscola(resource.data.escolaId) || souAnonimo();
-      allow update, delete: if podeEscreverNaEscola(resource.data.escolaId);
-      allow create: if podeEscreverNaEscola(request.resource.data.escolaId) || criacaoValidaPeloFuncionario();
+      allow update, delete: if podeAplicarAvaliacao(resource.data.escolaId);
+      allow create: if podeAplicarAvaliacao(request.resource.data.escolaId) || criacaoValidaPeloFuncionario();
     }
 
     // ---------------------------------------------------

@@ -35,8 +35,6 @@ import {
 
     where,
 
-    orderBy,
-
     serverTimestamp
 
 }
@@ -305,13 +303,15 @@ async function carregarFuncionarios(){
             ? []
             : [ where("escolaId","==",obterEscolaId()) ];
 
+        // Sem orderBy aqui de propósito — combinado com o where(escolaId)
+        // exigiria um índice composto que essa coleção nova ainda não tem
+        // no Firestore. A ordenação por nome já é feita no cliente logo
+        // abaixo (ordenarLista()).
         const consulta = query(
 
             collection(db,"funcionarios"),
 
-            ...condicoes,
-
-            orderBy("nome")
+            ...condicoes
 
         );
 

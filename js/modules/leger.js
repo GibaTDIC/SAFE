@@ -31,7 +31,6 @@ import{
     getDocs,
     query,
     where,
-    orderBy,
     Timestamp
 }
 from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
@@ -438,9 +437,13 @@ async function carregarFuncionarios(){
 
     try{
 
+        // Sem orderBy aqui de propósito — combinado com o where(escolaId)
+        // exigiria um índice composto que a coleção "funcionarios" ainda
+        // não tem no Firestore. A ordenação por nome já é feita no
+        // cliente em obterListaFiltrada().
         const condicoesFuncionarios = filtroEscola();
 
-        const qFuncionarios = query(collection(db,"funcionarios"), ...condicoesFuncionarios, orderBy("nome"));
+        const qFuncionarios = query(collection(db,"funcionarios"), ...condicoesFuncionarios);
 
         const snapFuncionarios = await getDocs(qFuncionarios);
 

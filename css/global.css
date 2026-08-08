@@ -625,12 +625,19 @@ textarea:focus{
 
 }
 
-/* Campo de pesquisa das telas de listagem (input direto, ex: alunos.html) */
+/* Campo de pesquisa das telas de listagem (input direto, ex: alunos.html).
+   flex:1 + min-width:0 em vez de width fixo: dentro de .toolbar-left
+   (flex aninhado), um width:320px + max-width:100% ficava só alguns
+   pixels dentro do limite da tela — frágil o bastante pra vazar de
+   verdade em telas reais. min-width:0 remove o mínimo implícito que
+   o flexbox dá a inputs, garantindo que encolha até onde precisar. */
 .search-box{
 
-    width:320px;
+    flex:1;
 
-    max-width:100%;
+    min-width:0;
+
+    max-width:320px;
 
 }
 

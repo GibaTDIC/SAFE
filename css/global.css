@@ -724,7 +724,38 @@ table{
 
     display:flex;
 
+    flex-wrap:nowrap;
+
     gap:8px;
+
+}
+
+/* ===========================
+   ROLAGEM DA TABELA (mobile)
+   Container em volta de .table/.safe-table nas telas de cadastro
+   (Turmas, Alunos, Escolas, Funcionários, Avaliadores). Sem isso,
+   quando a tabela não cabe (coluna de Ações com vários botões, por
+   exemplo), o navegador empurra a PÁGINA INTEIRA de lado pra tentar
+   caber tudo. Com o wrapper, só a tabela rola — o resto da tela
+   (menu, cabeçalho) fica parado.
+=========================== */
+
+.tabela-scroll{
+
+    width:100%;
+
+    overflow-x:auto;
+
+    -webkit-overflow-scrolling:touch;
+
+}
+
+.tabela-scroll table,
+.tabela-scroll .safe-table{
+
+    width:auto;
+
+    min-width:100%;
 
 }
 

@@ -86,39 +86,51 @@ export function classificarIMCOMS(imc){
 }
 
 // ======================================================
-// % DE GORDURA — protocolo de Petroski (1995), 4 dobras
-// cutâneas (subescapular, tríceps, supra-ilíaca, panturrilha
-// medial), convertendo densidade corporal em % de gordura
-// pela equação de Siri (1961).
+// % DE GORDURA — equações generalizadas de Petroski (1995)
+// pra adultos brasileiros, convertendo densidade corporal em
+// % de gordura pela equação de Siri (1961). Conferido contra
+// HEYWARD, V.H.; STOLARCZYK, L.M. "Avaliação da Composição
+// Corporal Aplicada" (Manole, 2000), Apêndice A.
 //
-// ATENÇÃO — PROVISÓRIO: os coeficientes abaixo foram
-// digitados de memória (sem acesso à publicação original no
-// momento da implementação). Confira contra Petroski, E.L.
-// "Desenvolvimento e validação de equações generalizadas para
-// a estimativa da densidade corporal em adultos" (1995) — ou
-// outra fonte confiável — antes de usar em avaliações reais.
+// IMPORTANTE: as dobras usadas são DIFERENTES por sexo — não
+// é o mesmo protocolo de 4 pontos pra todo mundo:
+//   Homens (304 casos, 18-61 anos): subescapular + tríceps +
+//     supra-ilíaca + panturrilha medial
+//   Mulheres (281 casos, 18-51 anos): axilar média +
+//     supra-ilíaca + coxa + panturrilha medial
 // ======================================================
 
 export function calcularPercentualGorduraPetroski(dobras, idade, sexo){
 
-    const { subescapular, triceps, suprailiaca, panturrilha } = dobras;
+    const feminino = (sexo || "").toLowerCase() === "feminino";
 
-    const somaDobras = subescapular + triceps + suprailiaca + panturrilha;
+    let somaDobras, densidadeCorporal;
 
-    let densidadeCorporal;
+    if(feminino){
 
-    if((sexo || "").toLowerCase() === "feminino"){
+        const { axilarMedia, suprailiaca, coxa, panturrilha } = dobras;
 
-        densidadeCorporal = 1.19911426 - (0.07545822 * Math.log10(somaDobras)) - (0.00088780 * idade);
+        somaDobras = axilarMedia + suprailiaca + coxa + panturrilha;
+
+        densidadeCorporal = 1.19547130 - (0.07513507 * Math.log10(somaDobras)) - (0.00041072 * idade);
 
     }else{
+
+        const { subescapular, triceps, suprailiaca, panturrilha } = dobras;
+
+        somaDobras = subescapular + triceps + suprailiaca + panturrilha;
 
         densidadeCorporal = 1.10726863 - (0.00081201 * somaDobras) + (0.00000212 * somaDobras * somaDobras) - (0.00041761 * idade);
 
     }
 
-    // Siri (1961): %G = (495 / densidade) - 450
-    const percentualGordura = (495 / densidadeCorporal) - 450;
+    // Conversão densidade → %G: Siri (1961) original é (495/D) - 450,
+    // mas Lohman (1986) mostra que a constante certa pra ADULTOS (20-50
+    // anos) muda por sexo — Tabela 1 do Heyward/Stolarczyk (2000):
+    // homens (495/D)-450 (igual ao Siri original), mulheres (503/D)-459.
+    const percentualGordura = feminino
+        ? (503 / densidadeCorporal) - 459
+        : (495 / densidadeCorporal) - 450;
 
     return {
 
@@ -475,6 +487,22 @@ function renderizarCard(dadosFuncionario){
 
         : "Sem registro anterior";
 
+    // Petroski usa dobras diferentes por sexo — ver comentário de
+    // calcularPercentualGorduraPetroski.
+    const feminino = (funcionario.sexo || "").toLowerCase() === "feminino";
+
+    const camposDobrasHtml = feminino ? `
+        <input type="number" step="0.1" min="0" class="form-control input-resultado input-axilarMedia" placeholder="dobra axilar média (mm)" aria-label="Dobra axilar média de ${funcionario.nome}">
+        <input type="number" step="0.1" min="0" class="form-control input-resultado input-suprailiaca" placeholder="dobra supra-ilíaca (mm)" aria-label="Dobra supra-ilíaca de ${funcionario.nome}">
+        <input type="number" step="0.1" min="0" class="form-control input-resultado input-coxa" placeholder="dobra coxa (mm)" aria-label="Dobra coxa de ${funcionario.nome}">
+        <input type="number" step="0.1" min="0" class="form-control input-resultado input-panturrilha" placeholder="dobra panturrilha (mm)" aria-label="Dobra panturrilha de ${funcionario.nome}">
+    ` : `
+        <input type="number" step="0.1" min="0" class="form-control input-resultado input-subescapular" placeholder="dobra subescapular (mm)" aria-label="Dobra subescapular de ${funcionario.nome}">
+        <input type="number" step="0.1" min="0" class="form-control input-resultado input-triceps" placeholder="dobra tríceps (mm)" aria-label="Dobra tríceps de ${funcionario.nome}">
+        <input type="number" step="0.1" min="0" class="form-control input-resultado input-suprailiaca" placeholder="dobra supra-ilíaca (mm)" aria-label="Dobra supra-ilíaca de ${funcionario.nome}">
+        <input type="number" step="0.1" min="0" class="form-control input-resultado input-panturrilha" placeholder="dobra panturrilha (mm)" aria-label="Dobra panturrilha de ${funcionario.nome}">
+    `;
+
     return `
 
         <div class="card-aluno-campo ${ausente ? "esmaecido" : ""}" id="card-${funcionario.id}">
@@ -497,10 +525,7 @@ function renderizarCard(dadosFuncionario){
                     <input type="number" step="0.1" min="0" class="form-control input-resultado input-peso" placeholder="peso (kg)" aria-label="Peso de ${funcionario.nome}">
                     <input type="number" step="0.1" min="0" class="form-control input-resultado input-estatura" placeholder="estatura (cm)" aria-label="Estatura de ${funcionario.nome}">
                     <input type="number" step="0.1" min="0" class="form-control input-resultado input-cintura" placeholder="cintura (cm)" aria-label="Cintura de ${funcionario.nome}">
-                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-subescapular" placeholder="dobra subescapular (mm)" aria-label="Dobra subescapular de ${funcionario.nome}">
-                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-triceps" placeholder="dobra tríceps (mm)" aria-label="Dobra tríceps de ${funcionario.nome}">
-                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-suprailiaca" placeholder="dobra supra-ilíaca (mm)" aria-label="Dobra supra-ilíaca de ${funcionario.nome}">
-                    <input type="number" step="0.1" min="0" class="form-control input-resultado input-panturrilha" placeholder="dobra panturrilha (mm)" aria-label="Dobra panturrilha de ${funcionario.nome}">
+                    ${camposDobrasHtml}
 
                     <button class="btn btn-primary btn-salvar-card">Salvar</button>
 
@@ -546,7 +571,21 @@ async function salvarResultado(funcionarioId){
 
     const card = document.getElementById(`card-${funcionarioId}`);
 
-    const campos = {
+    // Petroski usa dobras diferentes por sexo — ver comentário de
+    // calcularPercentualGorduraPetroski.
+    const feminino = (dadosFuncionario.funcionario.sexo || "").toLowerCase() === "feminino";
+
+    const campos = feminino ? {
+
+        peso: card?.querySelector(".input-peso"),
+        estatura: card?.querySelector(".input-estatura"),
+        cintura: card?.querySelector(".input-cintura"),
+        axilarMedia: card?.querySelector(".input-axilarMedia"),
+        suprailiaca: card?.querySelector(".input-suprailiaca"),
+        coxa: card?.querySelector(".input-coxa"),
+        panturrilha: card?.querySelector(".input-panturrilha")
+
+    } : {
 
         peso: card?.querySelector(".input-peso"),
         estatura: card?.querySelector(".input-estatura"),
@@ -604,14 +643,7 @@ async function salvarResultado(funcionarioId){
 
     const classificacaoRCE = classificarRCEAdulto(rce);
 
-    const { somaDobras, densidadeCorporal, percentualGordura } = calcularPercentualGorduraPetroski({
-
-        subescapular: valores.subescapular,
-        triceps: valores.triceps,
-        suprailiaca: valores.suprailiaca,
-        panturrilha: valores.panturrilha
-
-    }, idade, sexo);
+    const { somaDobras, densidadeCorporal, percentualGordura } = calcularPercentualGorduraPetroski(valores, idade, sexo);
 
     const contexto = obterContextoUsuario();
 
@@ -631,8 +663,12 @@ async function salvarResultado(funcionarioId){
         cintura: valores.cintura,
         rce,
         classificacaoRCE,
-        dobraSubescapular: valores.subescapular,
-        dobraTriceps: valores.triceps,
+        // Dobras usadas dependem do sexo (protocolo de Petroski) — as que
+        // não se aplicam ficam null (Firestore não aceita "undefined").
+        dobraSubescapular: valores.subescapular ?? null,
+        dobraTriceps: valores.triceps ?? null,
+        dobraAxilarMedia: valores.axilarMedia ?? null,
+        dobraCoxa: valores.coxa ?? null,
         dobraSuprailiaca: valores.suprailiaca,
         dobraPanturrilha: valores.panturrilha,
         somaDobras,

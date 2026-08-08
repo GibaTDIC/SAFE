@@ -44,7 +44,7 @@ export const TESTES_INFO = {
     antropometriaAdulto: {
         titulo: "Antropometria Adulta",
         imagem: "assets/teste-circunferenciacintura.png",
-        descricao: "Medição de peso, estatura, circunferência da cintura e 4 dobras cutâneas (subescapular, tríceps, supra-ilíaca e panturrilha medial) de um funcionário adulto da escola. O sistema calcula automaticamente o IMC (classificação da OMS), a Razão Cintura-Estatura (RCE) e o percentual de gordura corporal (protocolo de Petroski).",
+        descricao: "Medição de peso, estatura, circunferência da cintura e 4 dobras cutâneas de um funcionário adulto da escola — os pontos medidos dependem do sexo (protocolo de Petroski): homens (subescapular, tríceps, supra-ilíaca e panturrilha medial) ou mulheres (axilar média, supra-ilíaca, coxa e panturrilha medial). O sistema calcula automaticamente o IMC (classificação da OMS), a Razão Cintura-Estatura (RCE) e o percentual de gordura corporal.",
         cor: "#0891B2",
         unidade: "kg / cm / mm",
         video: null,

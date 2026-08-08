@@ -114,15 +114,31 @@ const TESTES_CONFIG = {
         titulo: "Antropometria Adulta",
         colecao: "avaliacoes_antropometria_adulto",
         tempoEstimado: "~5 min",
-        campos: [
-            { id:"peso", label:"Peso", tipo:"number", min:"0", passo:"0.1", unidade:"kg" },
-            { id:"estatura", label:"Estatura", tipo:"number", min:"0", passo:"0.1", unidade:"cm" },
-            { id:"cintura", label:"Cintura", tipo:"number", min:"0", passo:"0.1", unidade:"cm" },
-            { id:"subescapular", label:"Dobra subescapular", tipo:"number", min:"0", passo:"0.1", unidade:"mm" },
-            { id:"triceps", label:"Dobra tríceps", tipo:"number", min:"0", passo:"0.1", unidade:"mm" },
-            { id:"suprailiaca", label:"Dobra supra-ilíaca", tipo:"number", min:"0", passo:"0.1", unidade:"mm" },
-            { id:"panturrilha", label:"Dobra panturrilha medial", tipo:"number", min:"0", passo:"0.1", unidade:"mm" }
-        ],
+        // Petroski usa dobras diferentes por sexo — ver comentário de
+        // calcularPercentualGorduraPetroski em antropometriaAdulto.js.
+        camposPorSexo: {
+
+            masculino: [
+                { id:"peso", label:"Peso", tipo:"number", min:"0", passo:"0.1", unidade:"kg" },
+                { id:"estatura", label:"Estatura", tipo:"number", min:"0", passo:"0.1", unidade:"cm" },
+                { id:"cintura", label:"Cintura", tipo:"number", min:"0", passo:"0.1", unidade:"cm" },
+                { id:"subescapular", label:"Dobra subescapular", tipo:"number", min:"0", passo:"0.1", unidade:"mm" },
+                { id:"triceps", label:"Dobra tríceps", tipo:"number", min:"0", passo:"0.1", unidade:"mm" },
+                { id:"suprailiaca", label:"Dobra supra-ilíaca", tipo:"number", min:"0", passo:"0.1", unidade:"mm" },
+                { id:"panturrilha", label:"Dobra panturrilha medial", tipo:"number", min:"0", passo:"0.1", unidade:"mm" }
+            ],
+
+            feminino: [
+                { id:"peso", label:"Peso", tipo:"number", min:"0", passo:"0.1", unidade:"kg" },
+                { id:"estatura", label:"Estatura", tipo:"number", min:"0", passo:"0.1", unidade:"cm" },
+                { id:"cintura", label:"Cintura", tipo:"number", min:"0", passo:"0.1", unidade:"cm" },
+                { id:"axilarMedia", label:"Dobra axilar média", tipo:"number", min:"0", passo:"0.1", unidade:"mm" },
+                { id:"suprailiaca", label:"Dobra supra-ilíaca", tipo:"number", min:"0", passo:"0.1", unidade:"mm" },
+                { id:"coxa", label:"Dobra coxa", tipo:"number", min:"0", passo:"0.1", unidade:"mm" },
+                { id:"panturrilha", label:"Dobra panturrilha medial", tipo:"number", min:"0", passo:"0.1", unidade:"mm" }
+            ]
+
+        },
         calcular(valores, idade, sexo){
 
             const peso = Number(valores.peso);
@@ -137,23 +153,37 @@ const TESTES_CONFIG = {
 
             const classificacaoRCE = classificarRCEAdulto(rce);
 
-            const { somaDobras, densidadeCorporal, percentualGordura } = calcularPercentualGorduraPetroski({
+            const feminino = (sexo || "").toLowerCase() === "feminino";
+
+            const dobras = feminino ? {
+
+                axilarMedia: Number(valores.axilarMedia),
+                suprailiaca: Number(valores.suprailiaca),
+                coxa: Number(valores.coxa),
+                panturrilha: Number(valores.panturrilha)
+
+            } : {
 
                 subescapular: Number(valores.subescapular),
                 triceps: Number(valores.triceps),
                 suprailiaca: Number(valores.suprailiaca),
                 panturrilha: Number(valores.panturrilha)
 
-            }, idade, sexo);
+            };
+
+            const { somaDobras, densidadeCorporal, percentualGordura } = calcularPercentualGorduraPetroski(dobras, idade, sexo);
 
             return {
 
                 peso, estatura, imc, classificacaoIMC,
                 cintura, rce, classificacaoRCE,
-                dobraSubescapular: Number(valores.subescapular),
-                dobraTriceps: Number(valores.triceps),
-                dobraSuprailiaca: Number(valores.suprailiaca),
-                dobraPanturrilha: Number(valores.panturrilha),
+                // As que não se aplicam ficam null (Firestore não aceita "undefined").
+                dobraSubescapular: dobras.subescapular ?? null,
+                dobraTriceps: dobras.triceps ?? null,
+                dobraAxilarMedia: dobras.axilarMedia ?? null,
+                dobraCoxa: dobras.coxa ?? null,
+                dobraSuprailiaca: dobras.suprailiaca,
+                dobraPanturrilha: dobras.panturrilha,
                 somaDobras, densidadeCorporal, percentualGordura
 
             };
@@ -647,13 +677,32 @@ function abrirComoFazer(chave){
 // LANÇAMENTO
 // ======================================================
 
+// Alguns testes (ex: antropometriaAdulto) pedem campos diferentes
+// dependendo do sexo do funcionário (protocolo de Petroski) — outros
+// (ex: leger) têm uma lista única de campos, igual pra todo mundo.
+function obterCampos(config, sexo){
+
+    if(config.campos){
+
+        return config.campos;
+
+    }
+
+    const chaveSexo = (sexo || "").toLowerCase() === "feminino" ? "feminino" : "masculino";
+
+    return config.camposPorSexo[chaveSexo];
+
+}
+
 function abrirLancamento(){
 
     const config = TESTES_CONFIG[testeAtualChave];
 
+    const campos = obterCampos(config, funcionarioSelecionado?.sexo);
+
     const container = document.getElementById("camposLancamentoFuncionario");
 
-    container.innerHTML = config.campos.map(campo => `
+    container.innerHTML = campos.map(campo => `
 
         <div class="campo-lancamento-aluno">
 
@@ -680,11 +729,11 @@ function abrirLancamento(){
 
 }
 
-function coletarValores(config){
+function coletarValores(config, sexo){
 
     const valores = {};
 
-    for(const campo of config.campos){
+    for(const campo of obterCampos(config, sexo)){
 
         const input = document.getElementById(`campo_${campo.id}`);
 
@@ -768,7 +817,7 @@ async function salvarAvaliacao(){
 
     }
 
-    const valores = coletarValores(config);
+    const valores = coletarValores(config, funcionarioSelecionado.sexo);
 
     if(!valores){
 

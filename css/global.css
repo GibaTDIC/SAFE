@@ -759,6 +759,18 @@ table{
 
 }
 
+/* Sem isso, texto longo (nome, e-mail etc.) quebra em várias linhas
+   dentro da célula e deixa cada linha da tabela alta/comprida — com
+   nowrap, a célula mede o texto inteiro numa linha só e, se não
+   couber, é a rolagem horizontal do wrapper que resolve, não a
+   altura da linha. */
+.tabela-scroll th,
+.tabela-scroll td{
+
+    white-space:nowrap;
+
+}
+
 .btn-icon{
 
     width:36px;

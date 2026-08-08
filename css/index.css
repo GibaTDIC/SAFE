@@ -189,6 +189,60 @@ body{
 
 }
 
+/* ===========================
+   ACESSO DO AVALIADOR (login) — de propósito menor e mais
+   discreto que os cards de aluno/funcionário: é a entrada do
+   profissional, não uma terceira opção "igual" pro público.
+=========================== */
+
+.acesso-avaliador{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-top:28px;
+
+    padding:10px 20px;
+
+    border-radius:999px;
+
+    background:rgba(21,101,192,.06);
+
+    color:#64748b;
+
+    text-decoration:none;
+
+    font-weight:600;
+
+    font-size:13px;
+
+    border:1px solid rgba(21,101,192,.12);
+
+    transition:.2s;
+
+}
+
+.acesso-avaliador i{
+
+    font-size:15px;
+
+    color:var(--cor-primaria, #1565C0);
+
+}
+
+.acesso-avaliador:hover{
+
+    background:rgba(21,101,192,.1);
+
+    color:var(--cor-primaria, #1565C0);
+
+    border-color:rgba(21,101,192,.22);
+
+}
+
 .pagina-inicial footer{
 
     margin-top:40px;
